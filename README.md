@@ -1,5 +1,8 @@
 # luajitpi
-LuaJIT + TCC on RPi bare metal
+LuaJIT + TinyCC on RPi bare metal.
+
+
+**This has only been tested on an RPi B+. The changes to make this run on the RPi2 are probably easy (just the GPIO addresses) but I've not tested this!**
 
 ## Compiling
 I built the `arm-none-eabi toolchain` from source on Linux (lubuntu on x64) using a modified version of the script from https://gist.github.com/cjmeyer/4251208
@@ -38,5 +41,7 @@ I used [version 0.9.26 of TinyCC](http://download.savannah.gnu.org/releases/tiny
 
 ## UART access
 I based the UART access on dwelch67's [newlib example](https://github.com/dwelch67/raspberrypi/tree/master/newlib0).
+
+The bootloader in `bootloader/` is a slightly modified version of dwelch67's [`bootloader07`](https://github.com/dwelch67/raspberrypi/tree/master/bootloader07) (it prints dots and flashes the LED during loading, as the images are very large and it is nice to see progress).
 
 
