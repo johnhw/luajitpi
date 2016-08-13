@@ -40,8 +40,8 @@ I had to modify TCC slightly to make it compile without standard libraries or dy
 I used [version 0.9.26 of TinyCC](http://download.savannah.gnu.org/releases/tinycc/tcc-0.9.26.tar.bz2).
 
 ## UART access
-I based the UART access on dwelch67's [newlib example](https://github.com/dwelch67/raspberrypi/tree/master/newlib0).
+I based the UART access on dwelch67's [newlib example](https://github.com/dwelch67/raspberrypi/tree/master/newlib0) and the serial functions of [pijFORTHos](https://github.com/organix/pijFORTHos). 
 
-The bootloader in `bootloader/` is a slightly modified version of dwelch67's [`bootloader07`](https://github.com/dwelch67/raspberrypi/tree/master/bootloader07) (it prints dots and flashes the LED during loading, as the images are very large and it is nice to see progress).
+The bootloader in `bootloader/` is a slightly modified version of dwelch67's [`bootloader07`](https://github.com/dwelch67/raspberrypi/tree/master/bootloader07) (it prints dots and flashes the LED during loading, as the images are very large and it is nice to see some progress indication!).
 
 

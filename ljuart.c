@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libtcc.h>
+#include "serial.h"
 
 extern void PUT32 ( unsigned int, unsigned int );
 extern unsigned int GET32 ( unsigned int );
@@ -42,12 +43,15 @@ extern void dummy ( unsigned int );
 //------------------------------------------------------------------------
 void uart_putc ( unsigned int c )
 {
+    
     if(c==0x0A) uart_putc(0x0D);
-    while(1)
+   /* while(1)
     {
         if(GET32(AUX_MU_LSR_REG)&0x20) break;
     }
     PUT32(AUX_MU_IO_REG,c);
+    */
+    serial_write(c);
 }
 //------------------------------------------------------------------------
 void hexstrings ( unsigned int d )
@@ -70,12 +74,14 @@ void hexstrings ( unsigned int d )
 
 unsigned int uart_getc(void)
 {
-    while(1)
+   /* while(1)
         {
             if(GET32(AUX_MU_LSR_REG)&0x01) break;
         }
     unsigned int ra=GET32(AUX_MU_IO_REG);
     return ra;
+    */
+    return serial_read();
 }
 
 
@@ -145,62 +151,6 @@ void delete_tcc(void *tcc)
 {
     tcc_delete((TCCState *)tcc);
 }
-
-/*
-void test_tcc(void)
-{
-    int dood = 0;
-    int (*func)(int *);
-    static char test [] =
-        "int set_dood(int *n)\n"
-        "{\n *n = 0x000d00d;"
-        "}\n";
-        
-    TCCState *tcc = tcc_new();
-    printf("TCC state created\n");
-    
-    if(!tcc)
-    {
-        printf("TCC state not created :(\n");
-        return;
-    }
-    // disable standard libraries
-    if(!tcc_set_options(tcc, "-nostdlib"))
-    {
-        printf("TCC set notstdlib failed :(\n");
-        return;
-    }
-
-    
-    tcc_set_output_type(tcc, TCC_OUTPUT_MEMORY);
-    
-    if(tcc_compile_string(tcc, test)==-1)
-    {
-        printf("TCC compile failed :(\n");
-        return;
-    }
-    
-    if(tcc_relocate(tcc, TCC_RELOCATE_AUTO)<0)
-    {
-        printf("TCC relocate failed :(\n");
-        return;
-    }
-    
-    func = tcc_get_symbol(tcc, "set_dood");
-    if(!func)
-    {
-        printf("TCC get symbol failed :(\n");
-        return;
-    }
-    
-    func(&dood);
-    printf("Output should be 0x0000D00D: 0x%08X\n",dood);
-    
-    tcc_delete(tcc);
-    printf("TCC state deleted\n");
-
-}
-*/
 
 void test_tcc(void)
 {
@@ -308,9 +258,9 @@ void setspec(lua_State *L, const char *index, unsigned int value, const char *sp
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
 {
-    unsigned int ra;
+    //unsigned int ra;
     int error;
-    
+    /*
     PUT32(AUX_ENABLES,1);
     PUT32(AUX_MU_IER_REG,0);
     PUT32(AUX_MU_CNTL_REG,0);
@@ -334,7 +284,8 @@ int notmain ( unsigned int earlypc )
     PUT32(GPPUDCLK0,0);
 
     PUT32(AUX_MU_CNTL_REG,3);
-
+*/
+    serial_init();
     hexstring(0x12345678);
     hexstring(earlypc);
 
@@ -354,6 +305,11 @@ int notmain ( unsigned int earlypc )
     lua_newtable(L);
     LUA_REGISTER(uart_getc);
     LUA_REGISTER(uart_putc);
+    LUA_REGISTER(compile_tcc);
+    LUA_REGISTER(getsymbol_tcc);
+     
+    LUA_REGISTER(delete_tcc);
+    
     lua_setglobal(L, "cfuncs");
     
     /* register c functions, with their typespec */
