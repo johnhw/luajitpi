@@ -19,18 +19,32 @@
  * THE SOFTWARE.
  */
 
+#ifndef OUTPUT_H
+#define OUTPUT_H
+
 #include <stdint.h>
-#include <multiboot.h>
 
-struct multiboot_arm_functions *fns;
+typedef uint32_t rpi_boot_output_state;
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#ifdef BUILDING_RPIBOOT
+rpi_boot_output_state output_get_state();
+void output_restore_state(rpi_boot_output_state state);
+void output_enable_fb();
+void output_disable_fb();
+void output_enable_uart();
+void output_disable_uart();
+void output_enable_log();
+void output_disable_log();
+void output_enable_custom();
+void output_disable_custom();
+void output_init();
+int split_putc(int c);
+int register_custom_output_function(int (*putc_function)(int c));
+#endif
 
+#define RPIBOOT_OUTPUT_FB      (1 << 0)
+#define RPIBOOT_OUTPUT_UART    (1 << 1)
+#define RPIBOOT_OUTPUT_LOG		(1 << 2)
+#define RPIBOOT_OUTPUT_CUSTOM	(1 << 3)
+
+#endif

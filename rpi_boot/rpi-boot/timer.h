@@ -19,18 +19,33 @@
  * THE SOFTWARE.
  */
 
+#ifndef TIMER_H
+#define TIMER_H
+
+#include <stdlib.h>
 #include <stdint.h>
-#include <multiboot.h>
 
-struct multiboot_arm_functions *fns;
+typedef int usecs_t;
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+struct timer_wait
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+	uint32_t trigger_value;
+	int rollover;
+};
+
+int usleep(usecs_t usec);
+struct timer_wait register_timer(usecs_t usec);
+int compare_timer(struct timer_wait tw);
+
+#define TIMEOUT_WAIT(stop_if_true, usec) 		\
+do {							\
+	struct timer_wait tw = register_timer(usec);	\
+	do						\
+	{						\
+		if(stop_if_true)			\
+			break;				\
+	} while(!compare_timer(tw));			\
+} while(0);
+
+#endif
 

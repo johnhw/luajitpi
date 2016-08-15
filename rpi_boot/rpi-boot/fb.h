@@ -19,18 +19,25 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef FB_H
+#define FB_H
 
-struct multiboot_arm_functions *fns;
+#define FB_FAIL_GET_RESOLUTION		-1
+#define FB_FAIL_INVALID_RESOLUTION	-2
+#define FB_FAIL_SETUP_FB		-3
+#define FB_FAIL_INVALID_TAGS		-4
+#define FB_FAIL_INVALID_TAG_RESPONSE	-5
+#define FB_FAIL_INVALID_TAG_DATA	-6
+#define FB_FAIL_INVALID_PITCH_RESPONSE	-7
+#define FB_FAIL_INVALID_PITCH_DATA	-8
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+uint8_t *fb_get_framebuffer();
+int fb_init();
+int fb_get_bpp();
+int fb_get_byte_size();
+int fb_get_width();
+int fb_get_height();
+int fb_get_pitch();
+
+#endif
 

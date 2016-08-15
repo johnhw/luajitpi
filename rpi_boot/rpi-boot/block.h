@@ -19,18 +19,35 @@
  * THE SOFTWARE.
  */
 
+#ifndef BLOCK_H
+#define BLOCK_H
+
 #include <stdint.h>
-#include <multiboot.h>
+#include <stddef.h>
 
-struct multiboot_arm_functions *fns;
+struct fs;
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+struct block_device {
+	char *driver_name;
+	char *device_name;
+	uint8_t *device_id;
+	size_t dev_id_len;
+
+	int supports_multiple_block_read;
+	int supports_multiple_block_write;
+
+	int (*read)(struct block_device *dev, uint8_t *buf, size_t buf_size, uint32_t block_num);
+	int (*write)(struct block_device *dev, uint8_t *buf, size_t buf_size, uint32_t block_num);
+	size_t block_size;
+	size_t num_blocks;
+
+	struct fs *fs;
+};
+
+size_t block_read(struct block_device *dev, uint8_t *buf, size_t buf_size, uint32_t starting_block);
+size_t block_write(struct block_device *dev, uint8_t *buf, size_t buf_size, uint32_t starting_block);
+
+#endif
+
+#include "fs.h"
 

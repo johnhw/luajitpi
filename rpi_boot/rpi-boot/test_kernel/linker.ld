@@ -1,9 +1,5 @@
 ENTRY (loader)
 
-
-
-
-
 SECTIONS
 {
 	. = 0x00100000;
@@ -23,7 +19,6 @@ SECTIONS
 		*(.data)
 	}
 
-    __bss_start__ = .;
 	.bss :
 	{
 		sbss = .;
@@ -31,11 +26,5 @@ SECTIONS
 		*(.bss)
 		ebss = .;
 	}
-    __bss_end__ = .;
-    
-    __exidx_start = .;
-    .ARM.exidx : {*(.ARM.exidx* .gnu.linkonce.armexidx.*) } 
-    __exidx_end = .;
-
 }
 

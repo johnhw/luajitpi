@@ -19,18 +19,55 @@
  * THE SOFTWARE.
  */
 
+#include "timer.h"
+#include "mmio.h"
+#include <errno.h>
 #include <stdint.h>
-#include <multiboot.h>
+#include <stdlib.h>
 
-struct multiboot_arm_functions *fns;
+#define TIMER_CLO		0x20003004
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+int usleep(usecs_t usec)
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
+	struct timer_wait tw = register_timer(usec);
+	while(!compare_timer(tw));
+	return 0;	
+}
+
+struct timer_wait register_timer(usecs_t usec)
+{
+	struct timer_wait tw;
+	tw.rollover = 0;
+	tw.trigger_value = 0;
+
+	if(usec < 0)
+	{
+		errno = EINVAL;
+		return tw;
+	}
+	uint32_t cur_timer = mmio_read(TIMER_CLO);
+	uint32_t trig = cur_timer + (uint32_t)usec;
+
+	tw.trigger_value = trig;
+	if(trig > cur_timer)
+		tw.rollover = 0;
+	else
+		tw.rollover = 1;
+	return tw;
+}
+
+int compare_timer(struct timer_wait tw)
+{
+	uint32_t cur_timer = mmio_read(TIMER_CLO);
+
+	if(cur_timer < tw.trigger_value)
+	{
+		if(tw.rollover)
+			tw.rollover = 0;
+	}
+	else if(!tw.rollover)
+		return 1;
+
+	return 0;
 }
 

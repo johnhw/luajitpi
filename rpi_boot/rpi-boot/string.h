@@ -19,18 +19,22 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef STRING_H
+#define STRING_H
 
-struct multiboot_arm_functions *fns;
+#include <stddef.h>
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+void *memcpy(void *dest, const void *src, size_t n);
+void *memset(void *s, int c, size_t n);
+size_t strlen(const char *s);
+char *strcpy(char *dest, const char *src);
+char *strncpy(char *dest, const char *src, size_t n);
+int strcmp(const char *s1, const char *s2);
+char *strcat(char *dest, const char *src);
+int tolower(int c);
+int toupper(int c);
+char *strlwr(char *s);
+char *strupr(char *s);
+
+#endif
 

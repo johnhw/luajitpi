@@ -19,18 +19,18 @@
  * THE SOFTWARE.
  */
 
+#ifndef STDLIB_H
+#define STDLIB_H
+
+#include <stddef.h>
 #include <stdint.h>
-#include <multiboot.h>
 
-struct multiboot_arm_functions *fns;
+void abort(void);
+void *malloc(size_t size);
+void *realloc(void *ptr, size_t size);
+void free(void *ptr);
+long strtol(const char * restrict nptr, char ** restrict endptr, int base);
+long long strtoll(const char * restrict nptr, char ** restrict endptr, int base);
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#endif
 

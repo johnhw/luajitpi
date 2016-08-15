@@ -1,4 +1,4 @@
-/* Copyright (C) 2013 by John Cronin <jncronin@tysos.org>
+/* Copyright (C) 2013 by github.org/JamesC1
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,18 +19,23 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef ASSERT_H
+#define ASSERT_H
 
-struct multiboot_arm_functions *fns;
+#include <stdio.h>
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+void assertStackDump(void);
+
+#ifdef DEBUG2
+#define DEBUG
+#endif
+
+#ifdef DEBUG
+#define assert(x) \
+if(!(x)) {printf("ASSERT: failed: '%s'\n", #x); assertStackDump(); abort();}
+#else
+#define assert(x) (void)(x)
+#endif
+
+#endif
 

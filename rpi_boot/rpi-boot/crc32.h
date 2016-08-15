@@ -19,18 +19,12 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef CRC32_H
+#define CRC32_h
 
-struct multiboot_arm_functions *fns;
+uint32_t crc32(const void *buf, size_t size);
+uint32_t crc32_start();
+uint32_t crc32_append(uint32_t crc, const void *buf, size_t size);
+uint32_t crc32_finish(uint32_t crc);
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
-
+#endif

@@ -20,17 +20,21 @@
  */
 
 #include <stdint.h>
-#include <multiboot.h>
+#include "mmio.h"
 
-struct multiboot_arm_functions *fns;
+extern void memory_barrier();
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+inline void mmio_write(uint32_t reg, uint32_t data)
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
+	memory_barrier();
+	*(volatile uint32_t *)(reg) = data;
+	memory_barrier();
+}
+
+inline uint32_t mmio_read(uint32_t reg)
+{
+	memory_barrier();
+	return *(volatile uint32_t *)(reg);
+	memory_barrier();
 }
 

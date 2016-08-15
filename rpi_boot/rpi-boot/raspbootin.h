@@ -19,18 +19,19 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef RASPBOOTIN_H
+#define RASPBOOTIN_H
 
-struct multiboot_arm_functions *fns;
+#define SUCCESS         0
+#define PATH_NOT_FOUND  -1
+#define EOF_ERROR       -2
+#define CRC_ERROR       -3
+#define INVALID_CMD     -4
+#define UNSUPPORTED_CMD -5
+#define TIMEOUT         -6
+#define INVALID_MAGIC   -7
+#define UNKNOWN_ERROR   -8
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#define MAGIC           0x27594131
 
+#endif

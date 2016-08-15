@@ -39,10 +39,11 @@ ljuart.o : ljuart.c
 	$(ARMGNU)-gcc $(COPS) -c ljuart.c -o ljuart.o
 
 
+linenoise.o : linenoise.c
+	$(ARMGNU)-gcc $(COPS) -c linenoise.c -o linenoise.o    
     
-    
-luajit.elf : memmap vectors.o ljuart.o syscalls.o serial.o
-	$(ARMGNU)-ld vectors.o ljuart.o syscalls.o serial.o -T memmap -o luajit.elf $(LIB) -lluajit -ltcc -lc -lgcc -lm
+luajit.elf : memmap vectors.o ljuart.o syscalls.o serial.o linenoise.o
+	$(ARMGNU)-ld vectors.o ljuart.o syscalls.o serial.o linenoise.o -T memmap -o luajit.elf $(LIB) -lluajit -ltcc -lc -lgcc -lm
 
 luajit.bin : luajit.elf
 	$(ARMGNU)-objcopy luajit.elf -O binary luajit.bin

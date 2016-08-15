@@ -19,18 +19,39 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+/* This defines the basic usb structures and functions */
 
-struct multiboot_arm_functions *fns;
+#ifndef USB_H
+#define USB_H
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+#define USB_REQ_TYPE_CONTROL		0
+#define USB_REQ_TYPE_BULK		1
+#define USB_REQ_TYPE_INTERRUPT		2
+#define USB_REQ_TYPE_ISO		3
+
+#define USB_REQ_DIR_HD			0
+#define USB_REQ_DIR_DH			1
+
+struct usb_hcd;
+
+struct usb_request
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+	struct usb_hcd 	*hcd;
+	uint32_t	pipe;
+
+	int		type;
+	int		direction;
+};
+
+struct usb_hcd
+{
+	char	*driver_name;
+	char	*device_name;
+
+	int	(*send_req)(struct usb_hcd *, struct usb_request *);
+	int	(*reset)(struct usb_hcd *);
+};
+
+
+#endif
 

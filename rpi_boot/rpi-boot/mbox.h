@@ -19,18 +19,27 @@
  * THE SOFTWARE.
  */
 
+#ifndef MBOX_H
+#define MBOX_H
+
 #include <stdint.h>
-#include <multiboot.h>
 
-struct multiboot_arm_functions *fns;
+#define MBOX_BASE 0x2000b880
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#define MBOX_PEEK 0x10
+#define MBOX_READ 0x00
+#define MBOX_WRITE 0x20
+#define MBOX_STATUS 0x18
+#define MBOX_SENDER 0x14
+#define MBOX_CONFIG 0x1c
+
+#define MBOX_FB		1
+#define MBOX_PROP	8
+
+#define MBOX_SUCCESS	0x80000000
+
+uint32_t mbox_read(uint8_t channel);
+void mbox_write(uint8_t channel, uint32_t data);
+
+#endif
 

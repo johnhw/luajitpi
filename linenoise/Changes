@@ -1,0 +1,15 @@
+0.8    2015 Apr 29
+       - Fix memory leak (thanks, Dirk Feytons!)
+
+0.7    2015 Feb 24
+       - Bump linenoise version
+
+0.4    2012 Dec 18
+       - Offer more options when building.
+       - Update bundled version of linenoise.
+
+0.3    2012 Sep 19
+       - Update rockspec and upload to luarocks.
+
+0.2    ???
+       - Initial release.

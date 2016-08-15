@@ -20,17 +20,23 @@
  */
 
 #include <stdint.h>
-#include <multiboot.h>
+#include "atag.h"
 
-struct multiboot_arm_functions *fns;
+#define tag_next(t)		(struct atag *)((uint32_t *)(t) + (t)->hdr.size)
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+void parse_atags(uint32_t atags, void (*cb)(struct atag *))
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
+	if(atags == 0)
+		return;
+
+	struct atag *cur = (struct atag *)atags;
+	struct atag *prev;
+	do
+	{
+		prev = cur;
+
+		cb(cur);
+		cur = tag_next(cur);
+	} while(prev->hdr.tag != ATAG_NONE);
 }
 

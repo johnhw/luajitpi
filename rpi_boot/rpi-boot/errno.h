@@ -19,18 +19,19 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef ERRNO_H
+#define ERRNO_H
 
-struct multiboot_arm_functions *fns;
+extern int errno;
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#define ENOMEM		-1
+#define EINVAL		-2
+#define ENOENT		-3
+#define ENOTDIR		-4
+#define EFAULT		-5
+#define EROFS		-6
+#define ERANGE		-7
+#define ENOSPC		-8
+
+#endif
 

@@ -20,17 +20,68 @@
  */
 
 #include <stdint.h>
-#include <multiboot.h>
+#include <stdio.h>
 
-struct multiboot_arm_functions *fns;
+#define MAX_BRK 0xf0000
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+#ifdef ENABLE_USB
+#include "dwc_usb.h"
+#define MAX_BUF DWC_USB_FIFO_START
+#else
+#define MAX_BUF 0x100000
+#endif
+
+extern char _end;
+
+uint32_t cur_brk = 0;
+uintptr_t cur_buf = MAX_BRK;
+
+uintptr_t alloc_buf(size_t size)
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
+	uintptr_t old_buf = cur_buf;
+	
+	cur_buf += size;
+	if(cur_buf > MAX_BUF)
+	{
+		cur_buf = old_buf;
+		return 0;
+	}
+	// Align up to a 512 byte value
+	if(cur_buf & 0x1ff)
+	{
+		cur_buf &= ~0x1ff;
+		cur_buf += 0x200;
+	}
+	return old_buf;
+}
+
+void *sbrk(uint32_t increment)
+{
+	// sbrk returns the previous brk value
+	
+	// First set up cur_brk if not done already
+	if(cur_brk == 0)
+	{
+#ifdef DEBUG2
+		printf("HEAP: initializing at %x\n", (uint32_t)&_end);
+#endif
+
+		cur_brk = (uint32_t)&_end;
+		if(cur_brk & 0xfff)
+		{
+			cur_brk &= 0xfffff000;
+			cur_brk += 0x1000;
+		}
+	}
+
+	uint32_t old_brk = cur_brk;
+
+	cur_brk += increment;
+	if(cur_brk >= MAX_BRK)
+	{
+		cur_brk = old_brk;
+		return (void*)-1;
+	}
+	return (void*)old_brk;	
 }
 

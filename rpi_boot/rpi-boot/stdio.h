@@ -19,18 +19,31 @@
  * THE SOFTWARE.
  */
 
+#ifndef STDIO_H
+#define STDIO_H
+
 #include <stdint.h>
-#include <multiboot.h>
+#include <stddef.h>
 
-struct multiboot_arm_functions *fns;
+// Include vfs.h to get the FILE definition
+#include "vfs.h"
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#define stdin ((FILE *)0)
+#define stdout ((FILE *)1)
+#define stderr ((FILE *)2)
+
+int fputc(int c, FILE *stream);
+int fputs(const char *, FILE *stream);
+int putc(int c, FILE *stream);
+int putchar(int c);
+int puts(const char *s);
+
+int printf(const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+int sprintf(char *str, const char *format, ...);
+int snprintf(char *str, size_t size, const char *format, ...);
+
+void puthex(uint32_t val);
+
+#endif
 

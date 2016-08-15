@@ -19,18 +19,67 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+.section ".text.boot"
 
-struct multiboot_arm_functions *fns;
+.globl Start
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+Start:
+	mov sp, #0x8000
+
+	/* Clear out bss */
+	ldr r4, =_bss_start
+	ldr r9, =_bss_end
+	mov r5, #0
+	mov r6, #0
+	mov r7, #0
+	mov r8, #0
+
+	b .test
+
+.loop:
+	/* this does 4x4 = 16 byte stores at once */
+	stmia r4!, {r5-r8}	/* the '!' increments r4 but only after ('ia') the store */
+.test:
+	cmp r4, r9
+	blo .loop
+
+	/* branch and link to kernel_main */
+	ldr r3, =kernel_main
+	blx r3		/* blx may switch to Thumb mode, depending on the target address */
+
+halt:
+	wfe		/* equivalent of x86 HLT instruction */
+	b halt
+
+.globl flush_cache
+flush_cache:
+	mov 	r0, #0
+	mcr	p15, #0, r0, c7, c14, #0
+	mov	pc, lr
+
+.globl memory_barrier
+memory_barrier:
+	mov	r0, #0
+	mcr	p15, #0, r0, c7, c10, #5
+	mov	pc, lr
+
+.globl read_sctlr
+read_sctlr:
+	mrc	p15, #0, r0, c1, c0, #0
+	mov	pc, lr
+
+.globl quick_memcpy
+quick_memcpy:
+	push 	{r4-r9}
+	mov	r4, r0
+	mov	r5, r1
+
+.loopb:
+	ldmia	r5!, {r6-r9}
+	stmia	r4!, {r6-r9}
+	subs	r2, #16
+	bhi	.loopb
+
+	pop	{r4-r9}
+	mov	pc, lr
 

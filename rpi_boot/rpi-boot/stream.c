@@ -19,18 +19,11 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#include <stdio.h>
 
-struct multiboot_arm_functions *fns;
-
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
+int def_stream_putc(int c, FILE *stream)
 {
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
+	(void)(c); (void)(stream);
+	return 0;
 }
 

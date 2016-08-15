@@ -19,18 +19,15 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+#ifndef LOG_H
+#define LOG_H
 
-struct multiboot_arm_functions *fns;
+#include "vfs.h"
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#define LOG_DEFAULT_BUFFER_SIZE			512
 
+int log_putc(int c);
+int register_log_file(FILE *fp, size_t buffer_size);
+FILE *get_log_file();
+
+#endif

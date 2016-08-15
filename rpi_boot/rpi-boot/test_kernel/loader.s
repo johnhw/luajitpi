@@ -19,18 +19,36 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <multiboot.h>
+.global loader
 
-struct multiboot_arm_functions *fns;
+.set ALIGN,	1<<0
+.set MEMINFO,	1<<1
+.set FLAGS,	ALIGN | MEMINFO
+.set MAGIC,	0x1BADB002
+.set CHECKSUM,	-(MAGIC + FLAGS)
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+mboot_header:
+.long MAGIC
+.long FLAGS
+.long CHECKSUM
+
+.section .text
+
+stack_bottom:
+.skip 1024
+stack_top:
+.comm mbd, 4
+.comm magic, 4
+.comm m_type, 4
+.comm funcs, 4
+
+loader:
+	ldr	sp, =stack_top
+
+	ldr	r4, =kmain
+	blx	r4
+
+halt:
+	wfe
+	b halt
 

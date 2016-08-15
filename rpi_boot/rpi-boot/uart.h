@@ -19,18 +19,17 @@
  * THE SOFTWARE.
  */
 
+#ifndef UART_H
+#define UART_H
+
 #include <stdint.h>
-#include <multiboot.h>
+#include "timer.h"
 
-struct multiboot_arm_functions *fns;
+void uart_init();
+int uart_putc(int byte);
+void uart_puts(const char *str);
+int uart_getc();
+int uart_getc_timeout(usecs_t timeout);
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+#endif
 

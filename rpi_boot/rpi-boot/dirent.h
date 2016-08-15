@@ -19,18 +19,26 @@
  * THE SOFTWARE.
  */
 
+#ifndef DIRENT_H
+#define DIRENT_H
+
+struct dirent;
+struct dir_info { 
+	struct dirent *first;
+	struct dirent *next;
+};
+
+#ifdef DIR
+#undef DIR
+#endif
+#define DIR struct dir_info
+
+#include "vfs.h"
 #include <stdint.h>
-#include <multiboot.h>
+#include "multiboot.h"
 
-struct multiboot_arm_functions *fns;
 
-void kmain(uint32_t magic, multiboot_header_t *mbd, uint32_t m_type,
-		struct multiboot_arm_functions *funcs)
-{
-    fns = funcs;
-	funcs->clear();
-	funcs->printf("Welcome to the test kernel\n");
-	funcs->printf("Multiboot magic: %x\n", magic);
-	funcs->printf("Running on machine type: %x\n", m_type);
-}
+
+
+#endif
 
