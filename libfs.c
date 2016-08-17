@@ -148,6 +148,12 @@ int register_fs(struct block_device *dev, int part_id)
 		return -1;
 }
 
+uintptr_t alloc_buf(size_t size)
+{	
+    return (uintptr_t)malloc(size);
+}
+
+
 int fs_interpret_mode(const char *mode)
 {
 	// Interpret mode arguments
@@ -240,7 +246,7 @@ size_t fs_fread(uint32_t (*get_next_bdev_block_num)(uint32_t f_block_idx, MB_FIL
 				block_segment_length = last_block_offset - start_block_offset;
 
 			// Copy from the temporary buffer to the save buffer
-			qmemcpy(save_buf, &temp_buf[start_block_offset], block_segment_length);
+			memcpy(save_buf, &temp_buf[start_block_offset], block_segment_length);
 
 			// Increment the pointers
 			total_bytes_read += block_segment_length;
@@ -322,7 +328,7 @@ size_t fs_fwrite(uint32_t (*get_next_bdev_block_num)(uint32_t f_block_idx, MB_FI
 				return total_bytes_written;
 
 			// Edit the buffer
-			qmemcpy(&temp_buf[start_block_offset], save_buf, block_segment_length);
+			memcpy(&temp_buf[start_block_offset], save_buf, block_segment_length);
 
 			// Save the buffer
 			size_t bytes_written = block_write(fs->parent, temp_buf, fs_block_size, cur_bdev_block);

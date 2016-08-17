@@ -30,6 +30,20 @@ BRANCH_TO:		@ void BRANCH_TO(u32 addr);
 .globl dummy
 dummy:
     bx lr
+    
+    
+
+.globl flush_cache
+flush_cache:
+	mov 	r0, #0
+	mcr	p15, #0, r0, c7, c14, #0
+	mov	pc, lr
+
+.globl memory_barrier
+memory_barrier:
+	mov	r0, #0
+	mcr	p15, #0, r0, c7, c10, #5
+	mov	pc, lr    
 
 
 ;@-------------------------------------------------------------------------

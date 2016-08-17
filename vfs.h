@@ -62,7 +62,7 @@ struct vfs_file
     void *opaque;
     long len;
 	int flags;
-	int (*fflush_cb)(FILE *f);
+	int (*fflush_cb)(MB_FILE *f);
 };
 
 int mb_fseek(MB_FILE *stream, long offset, int whence);
@@ -86,6 +86,10 @@ int mb_fclose(MB_FILE *fp);
 DIR *mb_opendir(const char *name);
 struct mb_dirent *readdir(DIR *dirp);
 int mb_closedir(DIR *dirp);
+
+#define mb_stdin ((MB_FILE *)0)
+#define mb_stdout ((MB_FILE *)1)
+#define mb_stderr ((MB_FILE *)2)
 
 #endif
 

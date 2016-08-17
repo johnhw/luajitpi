@@ -19,31 +19,21 @@ clean :
 	rm -f *.bc
 	rm -f *.clang.opt.s
 
-vectors.o : vectors.s
-	$(ARMGNU)-as vectors.s -o vectors.o
 
-serial.o : serial.c
-	$(ARMGNU)-gcc $(COPS) -c serial.c -o serial.o
-
-timer.o : timer.c
-	$(ARMGNU)-gcc $(COPS) -c timer.c -o timer.o
+lua_boot.o : lua_boot.lua
+	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents lua_boot.lua lua_boot.o
+	
     
+OBJS = vectors.o serial.o timer.o ljuart.o lua_boot.o syscalls.o 
+OBJS += linenoise/linenoise.o linenoise/linenoise_lua.o 
+OBJS += elf.o mbox.o mmio.o block.o mbr.o emmc.o libfs.o fat.o vfs.o
+OBJS += console.o output.o font.o fb.o nofs.o ext2.o block_cache.o
 
-raspberry.o : raspberry.c
-	$(ARMGNU)-gcc $(COPS) -c raspberry.c -o raspberry.o
+FLAGS = -DENABLE_FRAMEBUFFER -DENABLE_SERIAL  -DENABLE_DEFAULT_FONT  -DENABLE_SD -DENABLE_MBR  -DENABLE_FAT
+FLAGS += -DENABLE_EXT2 -DENABLE_BLOCK_CACHE
     
-uart02.o : uart02.c
-	$(ARMGNU)-gcc $(COPS) -c uart02.c -o uart02.o
-
-ljuart.o : ljuart.c
-	$(ARMGNU)-gcc $(COPS) -c ljuart.c -o ljuart.o
-
-
-linenoise.o : linenoise.c
-	$(ARMGNU)-gcc $(COPS) -c linenoise.c -o linenoise.o    
-    
-luajit.elf : memmap vectors.o ljuart.o syscalls.o serial.o linenoise.o
-	$(ARMGNU)-ld vectors.o ljuart.o syscalls.o serial.o linenoise.o -T memmap -o luajit.elf $(LIB) -lluajit -ltcc -lc -lgcc -lm
+luajit.elf : memmap $(OBJS)  
+	$(ARMGNU)-ld $(OBJS) -T memmap -o luajit.elf $(LIB) -lluajit -ltcc -lc -lgcc -lm
 
 luajit.bin : luajit.elf
 	$(ARMGNU)-objcopy luajit.elf -O binary luajit.bin
@@ -51,10 +41,12 @@ luajit.bin : luajit.elf
 luajit.hex : luajit.elf
 	$(ARMGNU)-objcopy luajit.elf -O ihex luajit.hex
 
-syscalls.o : syscalls.c
-	$(ARMGNU)-gcc $(COPS) -c $(COPS) syscalls.c -o syscalls.o
 
+%.o: %.c Makefile
+	$(ARMGNU)-gcc $(COPS) $(FLAGS) -c $< -o $@
 
+%.o: %.s Makefile
+	$(ARMGNU)-as $(ASOPS) -c $< -o $@
 
 
 

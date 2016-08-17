@@ -143,8 +143,19 @@ _sbrk (int incr)
 {
     prev_heap_end = heap_end;
     heap_end += incr;
+    // Align up to a 512 byte value
+	if(heap_end & 0x1ff)
+	{
+		heap_end &= ~0x1ff;
+		heap_end += 0x200;
+	}
+    
     return (caddr_t) prev_heap_end;
+
 }
+
+
+
 
 int
 _fstat (int file, struct stat * st)
