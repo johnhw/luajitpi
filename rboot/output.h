@@ -19,39 +19,32 @@
  * THE SOFTWARE.
  */
 
-/* This defines the basic usb structures and functions */
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-#ifndef USB_H
-#define USB_H
+#include <stdint.h>
 
-#define USB_REQ_TYPE_CONTROL		0
-#define USB_REQ_TYPE_BULK		1
-#define USB_REQ_TYPE_INTERRUPT		2
-#define USB_REQ_TYPE_ISO		3
+typedef uint32_t rpi_boot_output_state;
 
-#define USB_REQ_DIR_HD			0
-#define USB_REQ_DIR_DH			1
 
-struct usb_hcd;
+rpi_boot_output_state output_get_state();
+void output_restore_state(rpi_boot_output_state state);
+void output_enable_fb();
+void output_disable_fb();
+void output_enable_uart();
+void output_disable_uart();
+void output_enable_log();
+void output_disable_log();
+void output_enable_custom();
+void output_disable_custom();
+void output_init();
+int split_putc(int c);
+int register_custom_output_function(int (*putc_function)(int c));
 
-struct usb_request
-{
-	struct usb_hcd 	*hcd;
-	uint32_t	pipe;
 
-	int		type;
-	int		direction;
-};
-
-struct usb_hcd
-{
-	char	*driver_name;
-	char	*device_name;
-
-	int	(*send_req)(struct usb_hcd *, struct usb_request *);
-	int	(*reset)(struct usb_hcd *);
-};
-
+#define RPIBOOT_OUTPUT_FB      (1 << 0)
+#define RPIBOOT_OUTPUT_UART    (1 << 1)
+#define RPIBOOT_OUTPUT_LOG		(1 << 2)
+#define RPIBOOT_OUTPUT_CUSTOM	(1 << 3)
 
 #endif
-

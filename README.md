@@ -31,6 +31,13 @@ and change the `BUILDMODE` from `mixed` to `static`
         
 then compile with:
         make HOST_CC="gcc -m32" CROSS="arm-none-eabi-"
+
+To enable dynamic link loading, edit lj_arch.h and adjust the LJ_TARGET_DLOPEN to
+
+	#define LJ_TARGET_DLOPEN 1
+
+add edit lj_clib.c and lib_package.c to include "ldl.h" instead of <dlfcn.h>.
+
   
 Note that luajit itself won't build (because `libdl` is missing) but this isn't important as `libluajit.a` will be built succesfully.
 

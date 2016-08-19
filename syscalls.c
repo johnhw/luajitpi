@@ -248,3 +248,9 @@ void abort()
  {
  }
 }
+
+
+// for NaCL
+void randombytes(uint8_t * x, uint64_t n)
+{
+}

@@ -20,6 +20,7 @@
 
 #include "tcc.h"
 
+
 /* only native compiler supports -run */
 #ifdef NEVER_TCC_IS_NATIVE
 
@@ -675,6 +676,7 @@ static int rt_get_caller_pc(addr_t *paddr, CONTEXT *uc, int level)
 #ifdef CONFIG_TCC_STATIC
 
 /* dummy function for profiling */
+/*
 ST_FUNC void *dlopen(const char *filename, int flag)
 {
     return NULL;
@@ -694,9 +696,10 @@ typedef struct TCCSyms {
     void *ptr;
 } TCCSyms;
 
+*/
 
 /* add the symbol you want here if no dynamic linking is done */
-static TCCSyms tcc_syms[] = {
+/*static TCCSyms tcc_syms[] = {
 #if !defined(CONFIG_TCCBOOT)
 #define TCCSYM(a) { #a, &a, },
     TCCSYM(printf)
@@ -707,7 +710,13 @@ static TCCSyms tcc_syms[] = {
 #endif
     { NULL, NULL },
 };
+*/
 
+ST_FUNC void *resolve_sym(TCCState *s1, const char *sym)
+{
+    return dlsym(RTLD_DEFAULT, sym);
+}
+/*
 ST_FUNC void *resolve_sym(TCCState *s1, const char *symbol)
 {
     TCCSyms *p;
@@ -719,6 +728,7 @@ ST_FUNC void *resolve_sym(TCCState *s1, const char *symbol)
     }
     return NULL;
 }
+*/
 
 #elif !defined(_WIN32)
 
@@ -734,7 +744,7 @@ ST_FUNC void *resolve_sym(TCCState *s1, const char *sym)
 
 
 /* dummy function for profiling */
-ST_FUNC void *dlopen(const char *filename, int flag)
+/*ST_FUNC void *dlopen(const char *filename, int flag)
 {
     return NULL;
 }
@@ -753,9 +763,9 @@ typedef struct TCCSyms {
     void *ptr;
 } TCCSyms;
 
-
+*/
 /* add the symbol you want here if no dynamic linking is done */
-static TCCSyms tcc_syms[] = {
+/*static TCCSyms tcc_syms[] = {
 #if !defined(CONFIG_TCCBOOT)
 #define TCCSYM(a) { #a, &a, },
     TCCSYM(printf)
@@ -777,6 +787,13 @@ ST_FUNC void *resolve_sym(TCCState *s1, const char *symbol)
         p++;
     }
     return NULL;
+}
+*/
+
+
+ST_FUNC void *resolve_sym(TCCState *s1, const char *sym)
+{
+    return dlsym(RTLD_DEFAULT, sym);
 }
 
 static int tcc_relocate_ex(TCCState *s1, void *ptr);

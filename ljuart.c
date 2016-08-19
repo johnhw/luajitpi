@@ -223,7 +223,8 @@ int notmain ( unsigned int earlypc )
     
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
-    luaopen_linenoise(L);
+    printf("Opened Lua state...\n");
+    //luaopen_linenoise(L);
     
     /* register c functions */
     lua_newtable(L);
@@ -236,12 +237,15 @@ int notmain ( unsigned int earlypc )
     
     lua_setglobal(L, "cfuncs");
     
+    printf("CFuncs created...\n");
     /* register c functions, with their typespec */
     lua_newtable(L);
     LUA_REGISTER_SPEC(uart_getc, "unsigned int uart_getc(void)");
     LUA_REGISTER_SPEC(uart_putc, "void uart_putc(unsigned int)");
     lua_setglobal(L, "cfunc_specs");
+    printf("Specs created...\n");
     int error = luaL_loadbuffer(L, &_binary_lua_boot_lua_start, (&_binary_lua_boot_lua_end)-(&_binary_lua_boot_lua_start), "boot") || lua_pcall(L,0,0,0);
+    printf("Lua called...\n");
     if(error)                
     {
         printf("ERROR: %s\n", lua_tostring(L,-1));
