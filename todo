@@ -11,8 +11,8 @@ sqlite [filesystem]
 lpeg [text matching]
 
 -- not compiled
+bitstream [bitstream reading/writing]
 penlight [lua utilities]
-repl [interactive use]
 dynasm [ARM assembler]
 turtle [quaternions, matrices]
 stb_texedit [text editor]

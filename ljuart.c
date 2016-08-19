@@ -203,6 +203,8 @@ void lua_execute(lua_State *L, char *str)
 }
 extern char _binary_lua_boot_lua_start;
 extern char _binary_lua_boot_lua_end;
+extern int luaopen_lpeg(lua_State *L);
+
 
 #define LUA_REGISTER(X) setfieldi(L, #X, (unsigned int)X)  
 #define LUA_REGISTER_SPEC(X,Y) setspec(L, #X, (unsigned int)X, Y)  
@@ -212,10 +214,9 @@ int notmain ( unsigned int earlypc )
 {    
     serial_init();
 
-    printf("LuaJIT-Pi\n");
-    printf("0x%08X\n",earlypc);
-    printf("%u\n",earlypc);
-
+    printf("[[ LuaJIT-2.0.4 -- Raspberry Pi -- Bare Metal OS\n");
+    printf("----\n");
+    
     printf("Checking TCC...\n");
     test_tcc();
     
@@ -224,7 +225,7 @@ int notmain ( unsigned int earlypc )
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
     printf("Opened Lua state...\n");
-    //luaopen_linenoise(L);
+    luaopen_lpeg(L);
     
     /* register c functions */
     lua_newtable(L);
