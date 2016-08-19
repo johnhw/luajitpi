@@ -32,7 +32,7 @@ create_sym.o : create_sym.lua
 sqlite/sqlite3.o : sqlite/sqlite3.c
 	echo "Nothing to do"
     
-OBJS = vectors.o serial.o ljuart.o lua_boot.o syscalls.o 
+OBJS = vectors.o serial.o ljuart.o lua_boot.o syscalls.o tcc_wrap.o
 OBJS += linenoise/linenoise.o 
 OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o 
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o

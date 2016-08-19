@@ -8,9 +8,7 @@
 #include <lualib.h>
 #include <string.h>
 #include <stdlib.h>
-#include <libtcc.h>
 #include "serial.h"
-
 
 void uart_putc ( unsigned int c )
 {
@@ -23,64 +21,11 @@ unsigned int uart_getc(void)
     return serial_read();
 }
 
-
-void *compile_tcc(char *s)
-{
-    TCCState *tcc = tcc_new();
-    
-    if(!tcc)
-    {
-        printf("TCC state not created :(\n");
-        return NULL;
-    }
-    
-    // disable standard libraries
-    if(!tcc_set_options(tcc, "-nostdlib"))
-    {
-        printf("TCC set nostdlib failed :(\n");
-        return NULL;
-    }
-    
-    tcc_set_output_type(tcc, TCC_OUTPUT_MEMORY);
-    
-    if(tcc_compile_string(tcc, s)==-1)
-    {
-        printf("TCC compile failed :(\n");
-        return NULL;
-    }
-    
-    if(tcc_relocate(tcc, TCC_RELOCATE_AUTO)<0)
-    {
-        printf("TCC relocate failed :(\n");
-        return NULL;
-    }
-    
-    return (void *) tcc;
- 
-}
-
-void *getsymbol_tcc(void *tcc, char *symbol)
-{
-    
-    void *func = (void*)(tcc_get_symbol((TCCState *)tcc, symbol));
-    if(!func)
-    {
-        printf("TCC get symbol failed :(\n");
-        return NULL;
-    }
-    return func;
-}    
-
-void delete_tcc(void *tcc)
-{
-    tcc_delete((TCCState *)tcc);
-}
-
 extern char _binary_lua_boot_lua_start;
 extern char _binary_lua_boot_lua_end;
 extern int luaopen_lpeg(lua_State *L);
 
-char *fallback_repl = "print('BOOT ERROR; FALLBACK REPL\n\n'); function error(msg); print(msg); end; while true; line = io.read(); f,err = loadstring(line); if f then xpcall(f,error) end; end;" ;
+char *fallback_repl = "print('BOOT SCRIPT ERROR; FALLBACK REPL\n\n'); function error(msg); print(msg); end; while true; line = io.read(); f,err = loadstring(line); if f then xpcall(f,error) end; end;" ;
 
 
 //------------------------------------------------------------------------
@@ -88,7 +33,7 @@ int notmain ( unsigned int earlypc )
 {    
     serial_init();
 
-    printf("[[ LuaJIT-2.0.4 -- Raspberry Pi -- Bare Metal OS\n");
+    printf("[[ LuaJIT-2.0.4 -- Raspberry Pi -- Bare Metal OS ]]\n");
     printf("\n\n");
 
     lua_State *L = luaL_newstate();
