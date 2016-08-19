@@ -80,7 +80,7 @@ extern char _binary_lua_boot_lua_start;
 extern char _binary_lua_boot_lua_end;
 extern int luaopen_lpeg(lua_State *L);
 
-char *fallback_repl = "print('BOOT ERROR; FALLBACK REPL\n\n'); function error(msg); print(msg); end; while true; line = io.read(); f,err = loadstring(line); if f then xpcall(f,error) end; end;" 
+char *fallback_repl = "print('BOOT ERROR; FALLBACK REPL\n\n'); function error(msg); print(msg); end; while true; line = io.read(); f,err = loadstring(line); if f then xpcall(f,error) end; end;" ;
 
 
 //------------------------------------------------------------------------
@@ -104,7 +104,12 @@ int notmain ( unsigned int earlypc )
     }
    
    // something went wrong: use the fallback REPL
-   int error = luaL_loadbuffer(L, fallback_repl, strlen(fallback_repl), "fallback") || lua_pcall(L,0,0,0);
+   error = luaL_loadbuffer(L, fallback_repl, strlen(fallback_repl), "fallback") || lua_pcall(L,0,0,0);
+    if(error)                
+    {
+        printf("Fallback script error: %s\n", lua_tostring(L,-1));
+        lua_pop(L,1);                    
+    }
     
 }
 //-------------------------------------------------------------------------
