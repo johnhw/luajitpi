@@ -25,7 +25,17 @@ extern char _binary_lua_boot_lua_start;
 extern char _binary_lua_boot_lua_end;
 extern int luaopen_lpeg(lua_State *L);
 
-char *fallback_repl = "print('BOOT SCRIPT ERROR; FALLBACK REPL\n\n'); function error(msg); print(msg); end; while true; line = io.read(); f,err = loadstring(line); if f then xpcall(f,error) end; end;" ;
+char *fallback_repl = 
+"function error(msg)\n"
+"   print(msg)\n"
+"end\n"
+"while true do\n"
+"   line = io.read()\n"
+"   f,err = loadstring(line)\n"
+"   if f then \n"
+"       xpcall(f,error)\n"
+"   end\n"
+"end\n";
 
 
 //------------------------------------------------------------------------
