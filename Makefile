@@ -39,8 +39,10 @@ OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o
 OBJS += rboot/console.o rboot/output.o rboot/font.o rboot/fb.o 
 OBJS += rboot/nofs.o rboot/ext2.o rboot/block_cache.o
-OBJS += miniz/miniz.o tweetnacl/tweetnacl.o sqlite/sqlite3.o sqlite_stubs.o
+OBJS += miniz/miniz.o tweetnacl/tweetnacl.o 
+#OBJS += sqlite/sqlite3.o sqlite_stubs.o
 OBJS += ldl.o luajit_fmap.o create_sym.o
+OBJS += lpeg-1.0.0/lptree.o lpeg-1.0.0/lpvm.o lpeg-1.0.0/lpprint.o lpeg-1.0.0/lpcode.o lpeg-1.0.0/lpcap.o
 
 FLAGS = -DENABLE_FRAMEBUFFER -DENABLE_SERIAL  -DENABLE_DEFAULT_FONT  -DENABLE_SD -DENABLE_MBR  -DENABLE_FAT
 FLAGS += -DENABLE_EXT2 -DENABLE_BLOCK_CACHE -DBUILDING_RPIBOOT -DMINIZ_NO_TIME 

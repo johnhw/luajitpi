@@ -3,21 +3,22 @@ luajit [primary language] +
 tcc [c compiler]
 
 -- compiled but unlinked
-nacl [crypto] 
+nacl [crypto] **MUST PROVIDE randombytes()! **
 miniz [compression]
 rpi-boot [framebuffer, sd card]
 linenoise [nice terminal]
 sqlite [filesystem]
+lpeg [text matching]
 
 -- not compiled
 penlight [lua utilities]
-lpeg [text matching]
 repl [interactive use]
 dynasm [ARM assembler]
 turtle [quaternions, matrices]
 stb_texedit [text editor]
 stb_image [image loading]
-nuklear? [ui]
+nuklear [ui]
 
+-- questionable
 torch? [numerical]
 

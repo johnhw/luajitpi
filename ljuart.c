@@ -220,7 +220,7 @@ int notmain ( unsigned int earlypc )
     test_tcc();
     
     printf("Complete...\n");
-    
+  
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
     printf("Opened Lua state...\n");
