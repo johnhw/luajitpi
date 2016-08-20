@@ -23,11 +23,11 @@ static char error_not_open[] = "No library open.";
 unsigned int lgetfield (lua_State *L, const char *key) {
       int result;
       lua_pushstring(L, key);
-      lua_gettable(L, -2);  /* get background[key] */
+      lua_gettable(L, -2);  
       if (!lua_isnumber(L, -1))
         return 0;
       result = (unsigned int)lua_tonumber(L, -1);
-      lua_pop(L, 1);  /* remove number */
+      lua_pop(L, 1);  
       return result;
 }
 
@@ -37,38 +37,14 @@ void lsetfieldi (lua_State *L, const char *index, unsigned int value) {
       lua_settable(L, -3);
     }
     
-/* References to the blocks of text the linker will include */
-/* The function table map (readelf -s luajit.elf | grep FUNC) */
-extern char _binary_luajit_fmap_start;
-extern char _binary_luajit_fmap_end;    
 
-/* The Lua that parses the function table and writes the sym_table object */
-extern char _binary_create_sym_lua_start;
-extern char _binary_create_sym_lua_end;    
-
-static lua_State *static_L = NULL;
+extern lua_State *boot_L;
 
 void *dlopen(const char *filename, int flag)
 {
     /* NB: flags are ignored */
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
     last_error = NULL;
-    
-    /* Push the function table string */
-    lua_pushlstring(L, &_binary_luajit_fmap_start, (&_binary_luajit_fmap_end)-(&_binary_luajit_fmap_start));
-    lua_setglobal(L, "fmap_string");
-    
-            
-    int error = luaL_loadbuffer(L, &_binary_create_sym_lua_start, (&_binary_create_sym_lua_end)-(&_binary_create_sym_lua_start), "create_sym_table") || lua_pcall(L,0,0,0);
-    if(error)                
-    {
-        last_error = lua_tostring(L,-1);        
-        lua_pop(L,1);                    
-        return NULL;
-    }    
-    static_L = L;
-    return (void *)L;
+    return (void *)boot_L;
 }
 
 const char *dlerror(void)
@@ -80,7 +56,7 @@ void *dlsym(void *handle, const char *symbol)
 {
     if(handle==RTLD_DEFAULT)
     {
-        handle = static_L;
+        handle = boot_L;
     }
     
     lua_State *L = (lua_State *)handle;
@@ -109,7 +85,4 @@ void *dlsym(void *handle, const char *symbol)
 
 void dlclose(void *handle)
 {
-    lua_State *L = (lua_State *)handle;
-    lua_close(L);
-    static_L = NULL;   
 }

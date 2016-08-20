@@ -21,10 +21,24 @@ unsigned int uart_getc(void)
     return serial_read();
 }
 
+/* The boot script run on start up */
 extern char _binary_lua_boot_lua_start;
 extern char _binary_lua_boot_lua_end;
+
+/* Reference to the zip file of files to be loaded at boot time */
+extern char _binary_bootfiles_zip_start;
+extern char _binary_bootfiles_zip_end;
+
+/* References to the blocks of text the linker will include */
+/* The function table map (readelf -s luajit.elf | grep FUNC) */
+extern char _binary_luajit_fmap_start;
+extern char _binary_luajit_fmap_end;    
+
+
 extern int luaopen_lpeg(lua_State *L);
 
+/* Very simple fallback REPL if the boot script somehow doesn't 
+   start it's own REPL successfully */
 char *fallback_repl = 
 "function error(msg)\n"
 "   print(msg)\n"
@@ -37,6 +51,9 @@ char *fallback_repl =
 "   end\n"
 "end\n";
 
+lua_State *boot_L;
+
+
 
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
@@ -46,26 +63,39 @@ int notmain ( unsigned int earlypc )
     printf("[[ LuaJIT-2.0.4 -- Raspberry Pi -- Bare Metal OS ]]\n");
     printf("\n\n");
 
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
-    luaopen_lpeg(L);
+    boot_L = luaL_newstate();
+    luaL_openlibs(boot_L);
+    luaopen_lpeg(boot_L);
     printf("Lua state opened.\n");
     
-    int error = luaL_loadbuffer(L, &_binary_lua_boot_lua_start, (&_binary_lua_boot_lua_end)-(&_binary_lua_boot_lua_start), "boot") || lua_pcall(L,0,0,0);
+    // Push the boot code zip file onto the stack
+    
+    lua_pushnumber(boot_L, (uint32_t)(&_binary_bootfiles_zip_start));
+    lua_setglobal(boot_L, "bootzip_ptr");
+    lua_pushnumber(boot_L, &_binary_bootfiles_zip_end-&_binary_bootfiles_zip_start);
+    lua_setglobal(boot_L, "bootzip_len");
+    /* Push the function table string */
+    lua_pushlstring(boot_L, &_binary_luajit_fmap_start, (&_binary_luajit_fmap_end)-(&_binary_luajit_fmap_start));
+    lua_setglobal(boot_L, "fmap_string");
+    
+    
+    int error = luaL_loadbuffer(boot_L, &_binary_lua_boot_lua_start, (&_binary_lua_boot_lua_end)-(&_binary_lua_boot_lua_start), "boot") || lua_pcall(boot_L,0,0,0);
     if(error)                
     {
-        printf("Boot script error: %s\n", lua_tostring(L,-1));
-        lua_pop(L,1);                    
+        printf("Boot script error: %s\n", lua_tostring(boot_L,-1));
+        lua_pop(boot_L,1);                    
     }
    
-   // something went wrong: use the fallback REPL
-   error = luaL_loadbuffer(L, fallback_repl, strlen(fallback_repl), "fallback") || lua_pcall(L,0,0,0);
+    // something went wrong: use the fallback REPL
+    error = luaL_loadbuffer(boot_L, fallback_repl, strlen(fallback_repl), "fallback") || lua_pcall(boot_L,0,0,0);
     if(error)                
     {
-        printf("Fallback script error: %s\n", lua_tostring(L,-1));
-        lua_pop(L,1);                    
+        printf("Fallback script error: %s\n", lua_tostring(boot_L,-1));
+        lua_pop(boot_L,1);                    
     }
     
+    // if we get here, something's really gone wrong!
+    return 0;
 }
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------

@@ -1,16 +1,20 @@
 -- implemented and linked
 luajit [primary language] +
 tcc [c compiler]
-
--- compiled but unlinked
-nacl [crypto] **MUST PROVIDE randombytes()! **
 miniz [compression]
 rpi-boot [framebuffer, sd card]
 linenoise [nice terminal]
-sqlite [filesystem]
 lpeg [text matching]
 
--- not compiled
+-- compiled but unlinked
+nacl [crypto] **MUST PROVIDE randombytes()! **
+sqlite [filesystem]
+
+--todo
+make procure read from the boot zip file
+
+-- not compiled/incuded
+ffi-reflect [ffi-reflection]
 bitstream [bitstream reading/writing]
 penlight [lua utilities]
 dynasm [ARM assembler]
