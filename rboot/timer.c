@@ -24,8 +24,9 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "../mem.h"
 
-#define TIMER_CLO		0x20003004
+#define TIMER_CLO		(MEM_GPIO_BASE+0x0003004)
 
 int usleep(usecs_t usec)
 {

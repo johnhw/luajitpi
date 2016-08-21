@@ -23,11 +23,12 @@
 #include "mmio.h"
 #include "uart.h"
 #include "timer.h"
+#include "../mem.h"
 
-#define GPIO_BASE 			0x20200000
+#define GPIO_BASE 			(MEM_GPIO_BASE+200000)
 #define GPPUD 				(GPIO_BASE + 0x94)
 #define GPPUDCLK0 			(GPIO_BASE + 0x98)
-#define UART0_BASE			0x20201000
+#define UART0_BASE			(MEM_GPIO_BASE+0x0201000)
 #define UART0_DR			(UART0_BASE + 0x00)
 #define UART0_RSRECR			(UART0_BASE + 0x04)
 #define UART0_FR			(UART0_BASE + 0x18)

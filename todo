@@ -18,12 +18,9 @@ lua-repl (from lua-repl, modified sources)  / https://github.com/hoelzro/lua-rep
 lua-linenoise (from lua-linenoise) https://github.com/hoelzro/lua-linenoise / MIT 
 
 --todo
-fix sp and heap end to the actual end of code (so they don't overlap!)
-
 enable dcache and mmu
 add assembler 
 add basic header files
-autocompletion
 add usb driver uspi
 interrupt based uart
 

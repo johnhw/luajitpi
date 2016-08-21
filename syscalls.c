@@ -12,11 +12,12 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
+#include "mem.h"
 
 int getch(void);
 int putch(int c);
 
-unsigned int heap_end=0x1000000;
+unsigned int heap_end=MEM_HEAP_START;
 unsigned int prev_heap_end;
 
 /* Forward prototypes.  */

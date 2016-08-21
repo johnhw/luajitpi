@@ -31,7 +31,7 @@ lua_boot.o : lua_boot.lua
 sqlite/sqlite3.o : sqlite/sqlite3.c
 	echo "Nothing to do"
     
-OBJS = vectors.o serial.o ljuart.o lua_boot.o syscalls.o tcc_wrap.o
+OBJS = vectors.o serial.o ljuart.o lua_boot.o syscalls.o tcc_wrap.o mmu.o
 OBJS += linenoise/linenoise.o 
 OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o 
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o

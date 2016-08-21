@@ -4,7 +4,7 @@
 #ifndef _SERIAL_H_
 #define _SERIAL_H_
 
-#include "raspi.h"
+#include "mem.h"
 
 extern void     serial_init();                  /* initialize serial UART */
 extern int      serial_in_ready();              /* input ready != 0, wait == 0 */

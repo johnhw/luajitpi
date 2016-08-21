@@ -1,12 +1,14 @@
 local pretty_print = require("pretty_print")
 
-pprint = function(f) 
+local tpprint = function(f) 
     local toprint = {}
     for k,v in ipairs(f) do
         if k>1 then table.insert(toprint, v) end
     end
     pretty_print.display(toprint) 
 end
+
+function pprint(f) pretty_print.display({f}) end 
 
 -- return a char* buffer with a given string
 function cstr(str)
@@ -46,7 +48,7 @@ function repl()
             xpargs = {xpcall(f, debug.traceback)}
             if xpargs[1]~=nil and table.getn(xpargs)>1 then
                 _ = xpargs[2]
-                pprint(xpargs)
+                tpprint(xpargs)
             end
         else
             console_error(err)

@@ -9,7 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "serial.h"
+#include "mem.h"
 
+
+ 
 void uart_putc ( unsigned int c )
 {
     if(c==0x0A) uart_putc(0x0D);
@@ -42,13 +45,16 @@ extern int luaopen_lpeg(lua_State *L);
 lua_State *boot_L;
 
 
-extern void start_l1cache(void);
+extern void enable_mmu(void);
 
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
-{    
+{   
+    
+    //enable_mmu();
     // start the instruction cache
     start_l1cache();
+    
     
     serial_init();
     

@@ -5,11 +5,12 @@
  * from David Welch at https://github.com/dwelch67/raspberrypi
  */
 #include "serial.h"
+#include "mem.h"
 
 #define USE_SERIAL_UART0    /* select full UART for serial i/o */
 //#define USE_SERIAL_UART1    /* select mini UART for serial i/o */
 
-#define GPIO_BASE       0x20200000
+#define GPIO_BASE       (MEM_GPIO_BASE + 0x200000)
 #define GPFSEL1         (*((volatile u32*)(GPIO_BASE + 0x04)))
 #define GPSET0          (*((volatile u32*)(GPIO_BASE + 0x1c)))
 #define GPCLR0          (*((volatile u32*)(GPIO_BASE + 0x28)))
@@ -37,7 +38,7 @@ struct uart0 {
     u32         ICR;    //_44;
     u32         DMACR;  //_48;
 };
-#define UART0           ((volatile struct uart0 *)0x20201000)
+#define UART0           ((volatile struct uart0 *)(MEM_GPIO_BASE+0x201000))
 
 struct uart1 {
     u32         _00;
@@ -68,7 +69,7 @@ struct uart1 {
     u32         STAT;   //_64;
     u32         BAUD;   //_68;
 };
-#define UART1           ((volatile struct uart1 *)0x20215000)
+#define UART1           ((volatile struct uart1 *)(MEM_GPIO_BASE+0x215000))
 
 /*
  * Initialize serial UART to use GPIO pins 14 (TX) and 15 (RX)
