@@ -44,19 +44,30 @@ end
 print("Memory access test, should dump first 256 bytes of ram")
 mem = ffi.new("unsigned char *", ffi.cast("unsigned char *", 0x0))
 
-function dump(start, len)
-    i = 0
+function dump(offset, len)
+    -- force 16 byte alignment
+    local i = 0
+    local off =  bit.band(offset, bit.bnot(15))
     while i<len do
-        s = ""
+        local s = ""
         for j = 0,15 do
-            s = s..string.format("%02X ", mem[i+j])
+            s = s..string.format("%02X ", mem[i+j+off])
         end
-        print(string.format("%08X",i).."  | "..s.." |")
+        
+        local ascii = ""
+        for j = 0,15 do
+            local m = mem[i+j+off]
+            if m>=32 and m<127 then
+                ascii = ascii .. string.char(m)
+            end
+        end
+
+        print(string.format("%08X",i+offset).."  |"..s.."|"..ascii)   
         i = i + 16
     end
 end
 
-dump(mem, 256)
+dump(0x8000, 0x100)
 
 
 deadbeef = [[

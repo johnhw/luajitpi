@@ -17,17 +17,15 @@ clean :
 	rm -f *.elf
 	rm -f *.list
 	rm -f *.img
-	rm -f *.zip
 	rm -f *.bc
 	rm -f *.clang.opt.s
 	touch luajit.fmap
+	rm bootfiles.zip
 
 
 lua_boot.o : lua_boot.lua
 	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents lua_boot.lua lua_boot.o
     
-create_sym.o : create_sym.lua
-	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents create_sym.lua create_sym.o 
         
 	
 sqlite/sqlite3.o : sqlite/sqlite3.c
@@ -40,16 +38,17 @@ OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o
 OBJS += rboot/console.o rboot/output.o rboot/font.o rboot/fb.o 
 OBJS += rboot/nofs.o rboot/ext2.o rboot/block_cache.o
 OBJS += miniz/miniz.o tweetnacl/tweetnacl.o 
-#OBJS += sqlite_stubs.o sqlite/sqlite3.o
-OBJS += ldl.o create_sym.o
+OBJS += sqlite_stubs.o 
+#sqlite/sqlite3.o
+OBJS += ldl.o 
 OBJS += dasm/csrc/dynasm/dasm_arm.o
 OBJS += lpeg-1.0.0/lptree.o lpeg-1.0.0/lpvm.o lpeg-1.0.0/lpprint.o lpeg-1.0.0/lpcode.o lpeg-1.0.0/lpcap.o
 
 FLAGS = -DENABLE_FRAMEBUFFER -DENABLE_SERIAL  -DENABLE_DEFAULT_FONT  -DENABLE_SD -DENABLE_MBR  -DENABLE_FAT
 FLAGS += -DENABLE_EXT2 -DENABLE_BLOCK_CACHE -DBUILDING_RPIBOOT -DMINIZ_NO_TIME  -DDASM_CHECKS
 
-bootfiles.zip : lua/*.lua
-	zip bootfiles.zip lua/*.lua luajit.fmap
+bootfiles.zip : lua/*
+	zip bootfiles.zip -r lua/
     
 bootfiles_zip.o : bootfiles.zip
 	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents bootfiles.zip bootfiles_zip.o

@@ -1,27 +1,39 @@
 -- implemented and linked
-luajit [primary language] +
-tcc [c compiler]
-miniz [compression]
-rpi-boot [framebuffer, sd card]
-linenoise [nice terminal]
-lpeg [text matching]
+luajit [primary language] + (LuaJIT 2.0.4, modified build script) https://github.com/LuaJIT/LuaJIT / MIT
+tcc [c compiler] (TCC + modified tccrun.c for baremetal) http://bellard.org/tcc/ / LGPL
+miniz [compression] (miniz.c) https://github.com/richgel999/miniz / public-domain/unlicense
+rpi-boot [framebuffer, sd card, fs] (rpiboot, modified to avoid name conflict) / https://github.com/jncronin/rpi-boot / BSD
+linenoise [nice terminal] (linenoise) / https://github.com/antirez/linenoise / BSD
+lpeg [text matching] (lpeg-1.0.0) / http://www.inf.puc-rio.br/~roberto/lpeg/ / MIT 
+uart02 example (from dwelch67) / https://github.com/dwelch67/raspberrypi/tree/master/uart02 / MIT
 
 -- compiled but unlinked
-nacl [crypto] **MUST PROVIDE randombytes()! **
-sqlite [filesystem]
+nacl [crypto] (tweetnacl) **MUST PROVIDE randombytes()! ** / https://tweetnacl.cr.yp.to/ / Public domain
+sqlite [filesystem]  / https://sqlite.org/ / Public domain
+dynasm [disassembler] (from LuaJIT 2.0.4) / MIT
+dkjson (dkjson) / http://dkolf.de/src/dkjson-lua.fsl/home / MIT
+ffi-reflect [ffi-reflection] (ffi-reflect) https://github.com/corsix/ffi-reflect / MIT?
+penlight [lua utilities] (penlight) / https://github.com/stevedonovan/Penlight / MIT
+lua-repl (from lua-repl, modified sources)  / https://github.com/hoelzro/lua-repl / MIT
+lua-linenoise (from lua-linenoise) https://github.com/hoelzro/lua-linenoise / MIT 
 
 --todo
-make procure read from the boot zip file
+fix sp and heap end to the actual end of code (so they don't overlap!)
+
+enable dcache and mmu
+add assembler 
+add basic header files
+autocompletion
+add usb driver uspi
+interrupt based uart
 
 -- not compiled/incuded
-ffi-reflect [ffi-reflection]
 bitstream [bitstream reading/writing]
-penlight [lua utilities]
 dynasm [ARM assembler]
 turtle [quaternions, matrices]
-stb_texedit [text editor]
-stb_image [image loading]
-nuklear [ui]
+stb_texedit [text editor] / public domain
+stb_image [image loading] / public domain
+nuklear [ui] / public domain
 
 -- questionable
 torch? [numerical]

@@ -16,7 +16,7 @@
 int getch(void);
 int putch(int c);
 
-unsigned int heap_end=0x0100000;
+unsigned int heap_end=0x1000000;
 unsigned int prev_heap_end;
 
 /* Forward prototypes.  */
