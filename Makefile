@@ -42,6 +42,7 @@ OBJS += sqlite_stubs.o
 #sqlite/sqlite3.o
 OBJS += ldl.o 
 OBJS += dasm/csrc/dynasm/dasm_arm.o
+OBJS += valvers/rpi-mailbox.o valvers/rpi-mailbox-interface.o
 OBJS += lpeg-1.0.0/lptree.o lpeg-1.0.0/lpvm.o lpeg-1.0.0/lpprint.o lpeg-1.0.0/lpcode.o lpeg-1.0.0/lpcap.o
 
 FLAGS = -DENABLE_FRAMEBUFFER -DENABLE_SERIAL  -DENABLE_DEFAULT_FONT  -DENABLE_SD -DENABLE_MBR  -DENABLE_FAT

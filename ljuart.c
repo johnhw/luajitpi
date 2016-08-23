@@ -90,9 +90,6 @@ int notmain ( unsigned int earlypc )
         
         set_memory_table();
         
-        
-        
-        
         // Push the boot code zip file onto the stack
         
         lua_pushnumber(boot_L, (uint32_t)(&_binary_bootfiles_zip_start));

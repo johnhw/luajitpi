@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <reent.h>
 #include "mem.h"
+#include "rboot/vfs.h"
 
 int getch(void);
 int putch(int c);
@@ -70,6 +71,13 @@ initialise_monitor_handles (void)
 void uart_putc ( unsigned int c );
 unsigned int uart_getc ( void );
 
+#define FILE_STDIN 0
+#define FILE_STDOUT 1
+#define FILE_STDERR 2
+
+#define MB_MAX_FILE_HANDLES 256
+static MB_FILE *file_handles[MB_MAX_FILE_HANDLES] = {0};
+
 
 int
 _read (int file,
@@ -77,8 +85,17 @@ _read (int file,
        int len)
 {
   int r; 
-  for(r=0;r<len;r++) ptr[r] = uart_getc();
-  return len;
+  if(file==FILE_STDIN)
+  {
+        for(r=0;r<len;r++) ptr[r] = uart_getc();
+        return len;       
+  }
+  else
+  {
+    if(file_handles[file])    
+        return mb_fread(ptr, 1, len, file_handles[file]);            
+    return -1;
+  }
 }
 
 
@@ -86,8 +103,18 @@ int
 _lseek (int file,
     int ptr,
     int dir)
-{
-    return 0;
+{    
+    if(file<=FILE_STDERR)
+        return 0;
+    /* Translate whence constants */
+    if(dir==SEEK_SET) dir=MB_SEEK_SET;
+    if(dir==SEEK_CUR) dir=MB_SEEK_CUR;
+    if(dir==SEEK_END) dir=MB_SEEK_END;
+       
+    if(file_handles[file]!=NULL)    
+        return mb_fseek(file_handles[file], ptr, dir);
+    return -1;
+    
 }
 
 
@@ -97,9 +124,12 @@ _write (int    file,
     int    len)
 {
     int r;  
-    for(r=0;r<len;r++) uart_putc(ptr[r]);
-    
-    return len;
+    if(1)//file==FILE_STDOUT || file==FILE_STDERR)
+    {
+        for(r=0;r<len;r++) uart_putc(ptr[r]);    
+        return len;
+    }
+    return -1;
 }
 
 int
@@ -107,14 +137,30 @@ _open (const char * path,
        int          flags,
        ...)
 {
-    return 0;
+                
+    MB_FILE *f = mb_fopen(path, "r");
+    if(f)
+    {   
+        int i;
+        for(i=FILE_STDERR+1;i<MB_MAX_FILE_HANDLES;i++)        
+            if(file_handles[i]==NULL) break;        
+        if(i==MB_MAX_FILE_HANDLES) return -1;
+        file_handles[i] = f;
+        return i;
+    }    
+    return -1;
+    
 }
 
 
 int
 _close (int file)
 {
-    return 0;
+    if(file<=FILE_STDERR || file_handles[file]==NULL)
+        return -1;
+    int result = mb_fclose(file_handles[file]);
+    file_handles[file]=NULL;
+    return result;
 }
 
 void
@@ -143,7 +189,7 @@ _sbrk (int incr)
     prev_heap_end = heap_end;
     heap_end += incr;
     
-    // Align up to a 4096 byte value
+    // Align up to a 4096 byte address
 	if(heap_end & 0xfff)
 	{
 		heap_end &= ~0xfff;
@@ -151,7 +197,6 @@ _sbrk (int incr)
 	}
     
     return (caddr_t) prev_heap_end;
-
 }
 
 
@@ -160,6 +205,8 @@ _sbrk (int incr)
 int
 _fstat (int file, struct stat * st)
 {
+  if(file<=FILE_STDERR)
+    return 0;
   return 0;
 }
 

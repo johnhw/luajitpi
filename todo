@@ -24,9 +24,9 @@ lua-glob-pattern / https://github.com/davidm/lua-glob-pattern / MIT
 test assembler 
 microlight?
 lsqlite3?
-file i/o
+cleaner mbox access
 add basic header files
-add usb driver uspi
+add usb driver uspi ?
 
 -- not compiled/incuded
 
