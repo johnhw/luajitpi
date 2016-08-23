@@ -1,4 +1,4 @@
-require("dynasm")
+dynasm = require("dynasm")
 
 local gencode, actions = dynasm.loadstring([[
 local ffi  = require('ffi')

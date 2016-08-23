@@ -76,8 +76,7 @@ _read (int file,
        char * ptr,
        int len)
 {
-  int r;
-  //for(r=0;r<len;r++) ptr[r] = getch();
+  int r; 
   for(r=0;r<len;r++) ptr[r] = uart_getc();
   return len;
 }
@@ -97,8 +96,7 @@ _write (int    file,
     char * ptr,
     int    len)
 {
-    int r;
-    //for(r=0;r<len;r++) putch(ptr[r]);
+    int r;  
     for(r=0;r<len;r++) uart_putc(ptr[r]);
     
     return len;
@@ -144,11 +142,12 @@ _sbrk (int incr)
 {
     prev_heap_end = heap_end;
     heap_end += incr;
-    // Align up to a 512 byte value
-	if(heap_end & 0x1ff)
+    
+    // Align up to a 4096 byte value
+	if(heap_end & 0xfff)
 	{
-		heap_end &= ~0x1ff;
-		heap_end += 0x200;
+		heap_end &= ~0xfff;
+		heap_end += 0x1000;
 	}
     
     return (caddr_t) prev_heap_end;
@@ -249,7 +248,6 @@ void abort()
  {
  }
 }
-
 
 // for NaCL
 void randombytes(uint8_t * x, uint64_t n)

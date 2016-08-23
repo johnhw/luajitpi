@@ -1,47 +1,47 @@
 #include "mem.h"
 
-#define MMUTABLEBASE MEM_MMU_TABLE
+volatile __attribute__ ((aligned (0x4000))) unsigned mem_mmu_table[MEM_MMU_TABLE_SIZE];
 
-//-------------------------------------------------------------------
-unsigned int mmu_section ( unsigned int vadd, unsigned int padd, unsigned int flags )
+/* Code from https://www.raspberrypi.org/forums/viewtopic.php?t=65922&p=491887 */
+void enable_mmu (void)
 {
-    unsigned int ra;
-    unsigned int rb;
-    unsigned int rc;
-    ra=vadd>>20;
-    rb=MMUTABLEBASE|(ra<<2);
-    rc=(padd&0xFFF00000)|0xC00|flags|2;
-    PUT32(rb,rc);
-    return(0);
-}
-//-------------------------------------------------------------------
-unsigned int mmu_small ( unsigned int vadd, unsigned int padd, unsigned int flags, unsigned int mmubase )
-{
-    unsigned int ra;
-    unsigned int rb;
-    unsigned int rc;
+  
 
-    ra=vadd>>20;
-    rb=MMUTABLEBASE|(ra<<2);
-    rc=(mmubase&0xFFFFFC00)/*|(domain<<5)*/|1;
-    PUT32(rb,rc); //first level descriptor
-    ra=(vadd>>12)&0xFF;
-    rb=(mmubase&0xFFFFFC00)|(ra<<2);
-    rc=(padd&0xFFFFF000)|(0xFF0)|flags|2;
-    PUT32(rb,rc); //second level descriptor
-    return(0);
-}
+  unsigned base;
+  for (base = 0; base < 512; base++)
+  {
+    // outer and inner write back, write allocate, shareable
+    mem_mmu_table[base] = base << 20 | 0x1140E;
+  }
+  for (; base < 4096; base++)
+  {
+    // shared device, never execute
+    mem_mmu_table[base] = base << 20 | 0x10416;
+  }
 
+  // restrict cache size to 16K (no page coloring)
+  unsigned auxctrl;
+  asm volatile ("mrc p15, 0, %0, c1, c0,  1" : "=r" (auxctrl));
+  auxctrl |= 1 << 6;
+  asm volatile ("mcr p15, 0, %0, c1, c0,  1" :: "r" (auxctrl));
 
-int enable_mmu(void)
-{
-    unsigned int ra;
-    for(ra=0;;ra+=0x00100000)
-    {
-        mmu_section(ra,ra,0x0000|8|4);
-        if(ra==0xFFF00000) break;
-    }
-    mmu_section(MEM_GPIO_BASE,MEM_GPIO_BASE,0x0000); //NOT CACHED!
-    mmu_section(MEM_GPIO_BASE+0x0200000,MEM_GPIO_BASE+0x0200000,0x0000); //NOT CACHED!
-    start_mmu(MMUTABLEBASE,0x00000001|0x1000|0x0004); //[23]=0 subpages enabled = legacy ARMv4,v5 and v6
+  // set domain 0 to client
+  asm volatile ("mcr p15, 0, %0, c3, c0, 0" :: "r" (1));
+
+  // always use TTBR0
+  asm volatile ("mcr p15, 0, %0, c2, c0, 2" :: "r" (0));
+
+  // set TTBR0 (page table walk inner cacheable, outer non-cacheable, shareable memory)
+  asm volatile ("mcr p15, 0, %0, c2, c0, 0" :: "r" (3 | (unsigned) &mem_mmu_table));
+
+  // invalidate data cache and flush prefetch buffer
+  asm volatile ("mcr p15, 0, %0, c7, c5,  4" :: "r" (0) : "memory");
+  asm volatile ("mcr p15, 0, %0, c7, c6,  0" :: "r" (0) : "memory");
+
+  // enable MMU, L1 cache and instruction cache, L2 cache, write buffer,
+  //   branch prediction and extended page table on
+  unsigned mode;
+  asm volatile ("mrc p15,0,%0,c1,c0,0" : "=r" (mode));
+  mode |= 0x0480180D;
+  asm volatile ("mcr p15,0,%0,c1,c0,0" :: "r" (mode) : "memory");
 }

@@ -37,21 +37,42 @@ extern char _binary_bootfiles_zip_end;
 extern char _binary_luajit_fmap_start;
 extern char _binary_luajit_fmap_end;    
 
-
+/* Lua libraries opened directly */
 extern int luaopen_lpeg(lua_State *L);
-
-
 
 lua_State *boot_L;
 
+/* from ldl.c */
+extern void lsetfieldi (lua_State *L, const char *index, unsigned int value);
+extern volatile __attribute__ ((aligned (0x4000))) unsigned mem_mmu_table[4096];
+extern unsigned int heap_end;
 
-extern void enable_mmu(void);
+void set_memory_table(void)
+{
+    lua_newtable(boot_L);
+    lsetfieldi(boot_L, "kernel_start", MEM_KERNEL_START);
+    lsetfieldi(boot_L, "stack_top", MEM_STACK_PTR);
+    lsetfieldi(boot_L, "heap_start", MEM_HEAP_START);
+    lsetfieldi(boot_L, "gpio_base", MEM_GPIO_BASE);
+    lsetfieldi(boot_L, "mmu_table_ptr", (uint32_t) mem_mmu_table);
+    lsetfieldi(boot_L, "mmu_table_size", MEM_MMU_TABLE_SIZE);
+    lsetfieldi(boot_L, "heap_ptr", (uint32_t) heap_end);     
+    // the fmap is always the last thing in the kernel
+    lsetfieldi(boot_L, "kernel_end", (uint32_t)(&_binary_luajit_fmap_end));
+    lua_setglobal(boot_L, "memmap");
+}    
 
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
 {   
     
-    //enable_mmu();
+    uart_putc('-');
+    uart_putc('-');
+    uart_putc('-');
+    uart_putc('\n');
+    
+    // turn on mmu
+    enable_mmu();
     // start the instruction cache
     start_l1cache();
     
@@ -66,7 +87,11 @@ int notmain ( unsigned int earlypc )
         boot_L = luaL_newstate();
         luaL_openlibs(boot_L);
         luaopen_lpeg(boot_L);
-        printf("Lua state opened.\n");
+        
+        set_memory_table();
+        
+        
+        
         
         // Push the boot code zip file onto the stack
         

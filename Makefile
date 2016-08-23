@@ -1,7 +1,7 @@
 
 ARMGNU ?= arm-none-eabi
 
-COPS = -Wall -Os -nostartfiles -ffreestanding  -march=armv6zk -mtune=arm1176jzf-s -I ../LuaJIT-2.0.4/src -DLUA_32BITS -I ../tcc-working -Wformat=0
+COPS = -Wall -Os -nostartfiles -ffreestanding  -march=armv6zk -mtune=arm1176jzf-s -I ../LuaJIT-2.0.4/src -DLUA_32BITS -I tcc -Wformat=0
 
 LIB = -L /home/arm/gcc-arm-none-eabi/arm-none-eabi/lib -L/home/arm/gcc-arm-none-eabi/lib/gcc/arm-none-eabi/4.9.4 -L../LuaJIT-2.0.4/src -Ltcc
 
@@ -36,7 +36,7 @@ OBJS += linenoise/linenoise.o
 OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o 
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o
 OBJS += rboot/console.o rboot/output.o rboot/font.o rboot/fb.o 
-OBJS += rboot/nofs.o rboot/ext2.o rboot/block_cache.o
+OBJS += rboot/nofs.o rboot/ext2.o rboot/block_cache.o rboot/atag.o
 OBJS += miniz/miniz.o tweetnacl/tweetnacl.o 
 OBJS += sqlite_stubs.o 
 #sqlite/sqlite3.o
