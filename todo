@@ -13,6 +13,7 @@ lua-repl (from lua-repl, modified sources)  / https://github.com/hoelzro/lua-rep
 lua-linenoise (from lua-linenoise) https://github.com/hoelzro/lua-linenoise / MIT 
 dkjson (dkjson) / http://dkolf.de/src/dkjson-lua.fsl/home / MIT
 dynasm [disassembler] (from LuaJIT 2.0.4) / MIT
+valvers arm c tutorial (mbox access) /  http://www.valvers.com/open-software/raspberry-pi/step01-bare-metal-programming-in-cpt1/
 
 -- compiled but unlinked
 nacl [crypto] (tweetnacl) **MUST PROVIDE randombytes()! ** / https://tweetnacl.cr.yp.to/ / Public domain
@@ -22,11 +23,16 @@ lua-glob-pattern / https://github.com/davidm/lua-glob-pattern / MIT
 
 --todo
 test assembler 
+modularise
+upload/download
+make i/o changeable from lua (use struct model with reentrance trap) 
+vectors at 0x0
+test hw rng
+
 microlight?
 lsqlite3?
-cleaner mbox access
 add basic header files
-add usb driver uspi ?
+add usb driver csud ?
 
 -- not compiled/incuded
 

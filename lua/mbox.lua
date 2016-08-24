@@ -176,13 +176,15 @@ extern int rpi_mbox_read( mbox_channel_t channel );
 ]])
 
 
-tag_set = {{"TAG_GET_BOARD_MODEL", "data32"}, 
-            {"TAG_GET_BOARD_REVISION", "data32"},
-            {"TAG_GET_FIRMWARE_VERSION", "data32"},
-            {"TAG_GET_BOARD_MAC_ADDRESS", "data_buffer_8", 6},
-            {"TAG_GET_BOARD_SERIAL", "data_buffer_32", 1},
-            }
-            
+
+
+tag_set = {model={"TAG_GET_BOARD_MODEL", }, 
+           revision={"TAG_GET_BOARD_REVISION", "data32"},
+           version={"TAG_GET_FIRMWARE_VERSION", "data32"},
+           mac={"TAG_GET_BOARD_MAC_ADDRESS", "data_buffer_8", 6},
+            serial={"TAG_GET_BOARD_SERIAL", "data_buffer_32", 1},
+            }            
+
             
 local add = ffi.C.rpi_property_add_tag
 local init = ffi.C.rpi_property_init
@@ -190,25 +192,26 @@ local process = ffi.C.rpi_property_process
 local get = ffi.C.rpi_property_get
 
 init()
-add(ffi.C.TAG_GET_BOARD_MODEL )
-add(ffi.C.TAG_GET_BOARD_REVISION )
-add(ffi.C.TAG_GET_FIRMWARE_VERSION )
-add(ffi.C.TAG_GET_BOARD_MAC_ADDRESS )
-add(ffi.C.TAG_GET_BOARD_SERIAL )
+for i, tag in pairs(tag_set) do
+    add(ffi.C[tag[1]])
+end
 process()
 
-mp = get(ffi.C.TAG_GET_BOARD_MODEL)
-atags.model = mp.data.value_32
-mp = get(ffi.C.TAG_GET_BOARD_REVISION)
-atags.revision = mp.data.value_32
-mp = get(ffi.C.TAG_GET_FIRMWARE_VERSION)
-atags.firmware = mp.data.value_32
-mp = get(ffi.C.TAG_GET_BOARD_MAC_ADDRESS)
+function get_tag(t)
+    tag = tag_set[t]
+    return get(ffi.C[tag[1]])
+end
+
+
+-- not really atags, but they fit best there
+atags.model = get_tag("model").data.value_32
+atags.revision = get_tag("revision").data.value_32
+atags.firmware =get_tag("version").data.value_32
+mp = get_tag("mac") 
 atags.mac = ""
 for i=1,6 do
     atags.mac = atags.mac..string.format("%02X",mp.data.buffer_8[i])
 end
-mp = get(ffi.C.TAG_GET_BOARD_SERIAL)
+mp = get_tag("serial")
 atags.serial = string.format("%08X", mp.data.buffer_32[1]) .. string.format("%08X", mp.data.buffer_32[0])
-
 atags.board = rpi_model_table[atags.revision]

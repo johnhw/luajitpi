@@ -45,3 +45,4 @@ void enable_mmu (void)
   mode |= 0x0480180D;
   asm volatile ("mcr p15,0,%0,c1,c0,0" :: "r" (mode) : "memory");
 }
+

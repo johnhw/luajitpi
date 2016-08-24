@@ -19,7 +19,7 @@ int getch(void);
 int putch(int c);
 
 unsigned int heap_end=MEM_HEAP_START;
-unsigned int prev_heap_end;
+
 
 /* Forward prototypes.  */
 int     _system     _PARAMS ((const char *));
@@ -43,6 +43,36 @@ int     _lseek      _PARAMS ((int, int, int));
 int     _read       _PARAMS ((int, char *, int));
 void    initialise_monitor_handles _PARAMS ((void));
 
+typedef struct sys_io
+{
+    /* Forward prototypes.  */
+    int     (*_system)    _PARAMS ((const char *));
+    int     (*_rename)     _PARAMS ((const char *, const char *));
+    int     (*isatty)      _PARAMS ((int));
+    clock_t (*_times)      _PARAMS ((struct tms *));
+    int     (*_gettimeofday)   _PARAMS ((struct timeval *, struct timezone *));
+    void    (*_raise)      _PARAMS ((void));
+    int     (*_unlink)     _PARAMS ((void));
+    int     (*_link)       _PARAMS ((void));
+    int     (*_stat)       _PARAMS ((const char *, struct stat *));
+    int     (*_fstat)      _PARAMS ((int, struct stat *));
+    caddr_t *(*_sbrk)       _PARAMS ((int));
+    int     (*_getpid)     _PARAMS ((int));
+    int     (*_kill)       _PARAMS ((int, int));
+    void    (*_exit)       _PARAMS ((int));
+    int     (*_close)      _PARAMS ((int));
+    int     (*_open)       _PARAMS ((const char *, int, ...));
+    int     (*_write)      _PARAMS ((int, char *, int));
+    int     (*_lseek)      _PARAMS ((int, int, int));
+    int     (*_read)       _PARAMS ((int, char *, int));    
+    
+    // if 1, these functions will not be used
+    int force_defaults;
+} sys_io;
+
+sys_io sys_io_table = {0};
+
+
 //static int
 //remap_handle (int fh)
 //{
@@ -52,6 +82,7 @@ void    initialise_monitor_handles _PARAMS ((void));
 void
 initialise_monitor_handles (void)
 {
+    sys_io_table.force_defaults = 1;
 }
 
 //static int
@@ -85,6 +116,10 @@ _read (int file,
        int len)
 {
   int r; 
+  
+  if(!sys_io_table.force_defaults && sys_io_table._read)
+        return sys_io_table._read(file, ptr, len);
+  
   if(file==FILE_STDIN)
   {
         for(r=0;r<len;r++) ptr[r] = uart_getc();
@@ -96,6 +131,8 @@ _read (int file,
         return mb_fread(ptr, 1, len, file_handles[file]);            
     return -1;
   }
+  
+  
 }
 
 
@@ -104,6 +141,9 @@ _lseek (int file,
     int ptr,
     int dir)
 {    
+    if(!sys_io_table.force_defaults && sys_io_table._lseek)
+        return sys_io_table._lseek(file, ptr, dir);
+    
     if(file<=FILE_STDERR)
         return 0;
     /* Translate whence constants */
@@ -123,6 +163,9 @@ _write (int    file,
     char * ptr,
     int    len)
 {
+    if(!sys_io_table.force_defaults && sys_io_table._lseek)
+        return sys_io_table._write(file, ptr, len);
+    
     int r;  
     if(1)//file==FILE_STDOUT || file==FILE_STDERR)
     {
@@ -186,16 +229,15 @@ _getpid (int n)
 caddr_t
 _sbrk (int incr)
 {
-    prev_heap_end = heap_end;
+    unsigned int prev_heap_end = heap_end;    
     heap_end += incr;
     
-    // Align up to a 4096 byte address
+    // Align to a 4096 byte address
 	if(heap_end & 0xfff)
 	{
 		heap_end &= ~0xfff;
 		heap_end += 0x1000;
-	}
-    
+	}    
     return (caddr_t) prev_heap_end;
 }
 

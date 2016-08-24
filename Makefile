@@ -54,17 +54,18 @@ bootfiles.zip : lua/*
 bootfiles_zip.o : bootfiles.zip
 	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents bootfiles.zip bootfiles_zip.o
 
-luajit.elf : memmap $(OBJS)  luajit_fmap.o bootfiles_zip.o
-	$(ARMGNU)-ld $(OBJS) luajit_fmap.o bootfiles_zip.o -T memmap -o luajit.elf $(LIB)  -lluajit -ltcc -lc -lgcc -lm
+luajit.elf : memmap $(OBJS)  fmap_dummy.o bootfiles_zip.o
+	$(ARMGNU)-ld $(OBJS) fmap_dummy.o bootfiles_zip.o -T memmap -o luajit.elf $(LIB)  -lluajit -ltcc -lc -lgcc -lm
 
-luajit.fmap : luajit.elf
-	readelf luajit.elf --wide -s | grep FUNC | sed "s/ \+/\t/g" | cut -f3,9 > luajit.fmap
+fmap.c : luajit.elf dl_header._h dl_footer._h
+	readelf luajit.elf --wide -s | grep FUNC | awk '{split($$0,l," "); printf("{0x%s,\"%s\"},\n", l[2], l[8]);}' > fmap.pre_h
+	cat dl_header._h fmap.pre_h dl_footer._h > fmap.c
 
-luajit_fmap.o : luajit.fmap
-	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.symdata,alloc,load,readonly,data,contents luajit.fmap luajit_fmap.o
+fmap.o : fmap.c
+	$(ARMGNU)-gcc $(COPS) $(FLAGS) fmap.c -c 
     
-luajit_complete.elf : memmap $(OBJS) luajit_fmap.o bootfiles_zip.o
-	$(ARMGNU)-ld $(OBJS) luajit_fmap.o bootfiles_zip.o -T memmap -o luajit_complete.elf $(LIB)  -lluajit -ltcc -lc -lgcc -lm    
+luajit_complete.elf : memmap $(OBJS)  bootfiles_zip.o fmap.o
+	$(ARMGNU)-ld $(OBJS) fmap.o bootfiles_zip.o -T memmap -o luajit_complete.elf $(LIB)  -lluajit -ltcc -lc -lgcc -lm    
 
 luajit.bin : luajit_complete.elf
 	$(ARMGNU)-objcopy luajit_complete.elf -O binary luajit.bin
