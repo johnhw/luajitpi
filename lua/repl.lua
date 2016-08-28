@@ -27,13 +27,34 @@ end
 
 ffi.C.linenoiseSetCompletionCallback(ln_complete)
 
+-- get a multiline input
+function get_multiline()
+    local lines_buffer = {}
+    while true do
+        line = ffi.string(ffi.C.linenoise("-"))
+        if line=='--<' then
+            return table.concat(lines_buffer)
+        else
+           table.insert(lines_buffer, line)
+           table.insert(lines_buffer, "\n")
+        end
+    end
+end
+
+
 function repl()
+
+    
     print("-----------------")
     print("Lua REPL")
 
     while true do
         line = ffi.string(ffi.C.linenoise(">>>"))
         
+        if line=='-->' then
+            line = get_multiline()
+        end
+
         -- try wrapping with a return statement
         f, err = loadstring("return "..line)
         if not f then

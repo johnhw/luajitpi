@@ -43,9 +43,11 @@ int     _lseek      _PARAMS ((int, int, int));
 int     _read       _PARAMS ((int, char *, int));
 void    initialise_monitor_handles _PARAMS ((void));
 
+// allow the syscalls to be "vectored out" later on
+// these will be called in preference to the built in calls
+// if force_defaults is zero
 typedef struct sys_io
 {
-    /* Forward prototypes.  */
     int     (*_system)    _PARAMS ((const char *));
     int     (*_rename)     _PARAMS ((const char *, const char *));
     int     (*isatty)      _PARAMS ((int));

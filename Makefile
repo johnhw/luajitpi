@@ -19,28 +19,24 @@ clean :
 	rm -f *.img
 	rm -f *.bc
 	rm -f *.clang.opt.s
-	touch luajit.fmap
 	rm bootfiles.zip
-
+	rm fmap.c
 
 lua_boot.o : lua_boot.lua
 	$(ARMGNU)-objcopy -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata,alloc,load,readonly,data,contents lua_boot.lua lua_boot.o
     
-        
-	
+
 sqlite/sqlite3.o : sqlite/sqlite3.c
 	echo "Nothing to do"
     
-OBJS = vectors.o serial.o ljuart.o lua_boot.o syscalls.o tcc_wrap.o mmu.o
-OBJS += linenoise/linenoise.o 
+OBJS = vectors.o ljuart.o lua_boot.o syscalls.o tcc_wrap.o  ldl.o
+OBJS += linenoise/linenoise.o mmu.o
 OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o 
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o
-OBJS += rboot/console.o rboot/output.o rboot/font.o rboot/fb.o 
+OBJS += rboot/console.o rboot/output.o rboot/font.o rboot/fb.o rboot/uart.o
 OBJS += rboot/nofs.o rboot/ext2.o rboot/block_cache.o rboot/atag.o
 OBJS += miniz/miniz.o tweetnacl/tweetnacl.o 
-OBJS += sqlite_stubs.o 
-#sqlite/sqlite3.o
-OBJS += ldl.o 
+#OBJS += sqlite_stubs.o sqlite/sqlite3.o sqlite/lsqlite3.o
 OBJS += dasm/csrc/dynasm/dasm_arm.o
 OBJS += valvers/rpi-mailbox.o valvers/rpi-mailbox-interface.o
 OBJS += lpeg-1.0.0/lptree.o lpeg-1.0.0/lpvm.o lpeg-1.0.0/lpprint.o lpeg-1.0.0/lpcode.o lpeg-1.0.0/lpcap.o

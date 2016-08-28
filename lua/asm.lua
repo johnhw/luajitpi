@@ -9,14 +9,6 @@ function disas(addr, len, out)
     dis.disass(dmem, addr, out)
 end
 
-mem = ffi.new("unsigned char *", ffi.cast("unsigned char *", 0x0))
-mem32 = {}
-_mem32 = ffi.new("unsigned int *", ffi.cast("unsigned int *", 0x0))
-local mt_mem32 = {
-__index = function(addr) return _mem32[bit.rshift(addr,4)] end,
-__newindex = function(addr,val) _mem32[bit.rshift(addr,4)]=val end
-}
-setmetatable(mem32, mt_mem32)
 
 
 function dump(offset, len)

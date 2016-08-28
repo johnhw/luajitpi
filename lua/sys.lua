@@ -12,9 +12,37 @@ end
     
 ffi.cdef([[
 void enable_mmu(void);
-void disble_cache(void);
-void enable_cache(void);
 ]])    
 
+mem = ffi.new("unsigned char *", ffi.cast("unsigned char *", 0x0))
+mem32 = {}
+_mem32 = ffi.new("unsigned int *", ffi.cast("unsigned int *", 0x0))
+local mt_mem32 = {
+__index = function(t,addr) return t[bit.rshift(addr,2)] end,
+__newindex = function(t,addr,val) t[bit.rshift(addr,2)]=val end
+}
+setmetatable(mem32, mt_mem32)
+
+-- simple get and put functions
+function get32(addr)
+    return _mem32[bit.rshift(addr, 2)]
+end
+
+function put32(addr, val)
+    _mem32[bit.rshift(addr, 2)] = val
+end
+
+
+function set_bit(v, b)
+    return bit.bor(v, bit.lshift(1, b))
+end
+
+function clear_bit(v, b)
+    return bit.band(v, bit.bnot(bit.lshift(1, b)))
+end
+
+function get_bit(v, b)
+    return bit.rshift(bit.band(v, bit.lshift(1,b)), b)
+end
+ 
 ffi.C.enable_mmu()
-ffi.C.enable_cache()

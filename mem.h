@@ -16,8 +16,8 @@ typedef unsigned int u32;
 
 #define MEM_RESERVED            0x000000  
 #define MEM_KERNEL_START        0x008000 
-#define MEM_STACK_PTR           0x210000
-#define MEM_HEAP_START          0x220000     
+#define MEM_STACK_PTR           0x310000
+#define MEM_HEAP_START          0x320000     
 #define MEM_GPIO_BASE           0x20000000
 #define MEM_MMU_TABLE_SIZE      0x8000 
 

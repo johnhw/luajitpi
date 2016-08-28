@@ -5,10 +5,10 @@
 #include <lualib.h>
 #include <string.h>
 #include <stdlib.h>
-#include "serial.h"
+//#include "serial.h"
 #include "mem.h"
 
- 
+/* 
 void uart_putc ( unsigned int c )
 {
     if(c==0x0A) uart_putc(0x0D);
@@ -19,16 +19,7 @@ unsigned int uart_getc(void)
 {
     return serial_read();
 }
-
-void enable_cache(void)
-{
-    start_l1cache();
-}
-
-void disable_cache(void)
-{
-    stop_l1cache();
-}
+*/
 
 void lsetfieldi (lua_State *L, const char *index, unsigned int value) {
       lua_pushstring(L, index);
@@ -54,6 +45,8 @@ extern unsigned mem_mmu_table[4096];
 extern unsigned int heap_end;
 extern void * __kernel_end;
 
+
+
 void set_memory_table(void)
 {
     lua_newtable(boot_L);
@@ -66,19 +59,16 @@ void set_memory_table(void)
     lsetfieldi(boot_L, "heap_ptr", (uint32_t) heap_end);     
     /* Read from the symbol in the linker script */
     lsetfieldi(boot_L, "kernel_end", (uint32_t) __kernel_end);     
-   lua_setglobal(boot_L, "memmap");
+    lua_setglobal(boot_L, "memmap");
 }    
 
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
 {   
     
-    uart_putc('*');
-    uart_putc('-');
-    uart_putc(')');
-    uart_putc('\n');
-               
-    serial_init();
+   
+    //serial_init();
+    uart_init();
     
     while(1)
     {

@@ -22,12 +22,14 @@ lua-glob-pattern / https://github.com/davidm/lua-glob-pattern / MIT
 
 
 --todo
-test assembler 
+assembler 
 modularise
+basic multiline editor (list of lines)
 upload/download
-make i/o changeable from lua (use struct model with reentrance trap) 
+make i/o changeable from lua 
 vectors at 0x0
 test hw rng
+check memory access
 
 microlight?
 lsqlite3?
