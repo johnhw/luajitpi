@@ -109,10 +109,16 @@ mz_bool mz_zip_reader_end(mz_zip_archive *pZip);
 ]])
 
 -- open a zip file, returning an object representing it
+
+
+function makezip(zip)
+    return {zip=zip, expand=expandzip, list=listzip, close=closezip}
+end
+
 function openzip(memptr, size)
     zip = ffi.new("mz_zip_archive")
     miniz.mz_zip_reader_init_mem(zip, memptr, size, 0)
-    return {zip=zip, expand=expandzip, list=listzip, close=closezip}
+    return makezip(zip)
 end
 
 -- expand a file from a zip archive, returing a new Lua string
@@ -140,7 +146,8 @@ function closezip(zip)
 end
 
 -- point to the zip file compiled in
-bootzip = openzip(ffi.cast("void*", bootzip_ptr), bootzip_len)
+bootzip = makezip(ffi.cast("mz_zip_archive *", _bootzip))
+
  
 function console_error(err) print("ERROR:", err) end
 

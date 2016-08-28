@@ -5,21 +5,9 @@
 #include <lualib.h>
 #include <string.h>
 #include <stdlib.h>
-//#include "serial.h"
 #include "mem.h"
-
-/* 
-void uart_putc ( unsigned int c )
-{
-    if(c==0x0A) uart_putc(0x0D);
-    serial_write(c);
-}
-
-unsigned int uart_getc(void)
-{
-    return serial_read();
-}
-*/
+#include "miniz/miniz.c"
+#include "rboot/uart.h"
 
 void lsetfieldi (lua_State *L, const char *index, unsigned int value) {
       lua_pushstring(L, index);
@@ -27,10 +15,6 @@ void lsetfieldi (lua_State *L, const char *index, unsigned int value) {
       lua_settable(L, -3);
     }
     
-/* The boot script run on start up */
-extern char _binary_lua_boot_lua_start;
-extern char _binary_lua_boot_lua_end;
-
 /* Reference to the zip file of files to be loaded at boot time */
 extern char _binary_bootfiles_zip_start;
 extern char _binary_bootfiles_zip_end;
@@ -44,7 +28,6 @@ lua_State *boot_L;
 extern unsigned mem_mmu_table[4096];
 extern unsigned int heap_end;
 extern void * __kernel_end;
-
 
 
 void set_memory_table(void)
@@ -65,9 +48,7 @@ void set_memory_table(void)
 //------------------------------------------------------------------------
 int notmain ( unsigned int earlypc )
 {   
-    
    
-    //serial_init();
     uart_init();
     
     while(1)
@@ -81,14 +62,20 @@ int notmain ( unsigned int earlypc )
         printf("Opened lua...\n");
         set_memory_table();
         
-        /* Push the boot code zip file pointer onto the stack */        
-        lua_pushnumber(boot_L, (uint32_t)(&_binary_bootfiles_zip_start));
-        lua_setglobal(boot_L, "bootzip_ptr");
-        lua_pushnumber(boot_L, &_binary_bootfiles_zip_end-&_binary_bootfiles_zip_start);
-        lua_setglobal(boot_L, "bootzip_len");
+        mz_zip_archive bootzip = {0};
+        size_t boot_size = 0;
         
-        printf("Boot starting...\n");        
-        int error = luaL_loadbuffer(boot_L, &_binary_lua_boot_lua_start, (&_binary_lua_boot_lua_end)-(&_binary_lua_boot_lua_start), "boot") || lua_pcall(boot_L,0,0,0);
+        /* Unzip the boot file */
+        mz_zip_reader_init_mem(&bootzip, (void*)&_binary_bootfiles_zip_start, (size_t)(&_binary_bootfiles_zip_end-&_binary_bootfiles_zip_start), 0);
+        char *boot_lua = mz_zip_reader_extract_file_to_heap(&bootzip, "lua/lua_boot.lua", &boot_size, 0);        
+        printf("Extracted lua_boot.lua at %d bytes...\n", boot_size);   
+        
+        /* Push the boot code zip file pointer onto the stack */        
+        lua_pushnumber(boot_L, (uint32_t)&bootzip);
+        lua_setglobal(boot_L, "_bootzip");
+        
+        /* Run the boot script */
+        int error = luaL_loadbuffer(boot_L, boot_lua, boot_size, "boot") || lua_pcall(boot_L,0,0,0);
         if(error)                
         {
             printf("Boot script error: %s\n", lua_tostring(boot_L,-1));
