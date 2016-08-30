@@ -9,9 +9,6 @@
 
 /* Simple stubs for emulating dynamic library support.
    This enables the use of ffi.open() in LuaJIT.
-   
-   Uses LuaJIT itself to store and manage the symbol map lookup.
-   
 */   
 
 static char *last_error;
