@@ -29,3 +29,31 @@ extern int crypto_stream_salsa20_tweet_xor(unsigned char *,const unsigned char *
 extern int crypto_verify_16_tweet(const unsigned char *,const unsigned char *);
 extern int crypto_verify_32_tweet(const unsigned char *,const unsigned char *);
 ]])
+
+local crypto_core_hsalsa20_tweet_OUTPUTBYTES=32
+local crypto_core_hsalsa20_tweet_INPUTBYTES=16
+local crypto_core_hsalsa20_tweet_KEYBYTES=32
+local crypto_core_hsalsa20_tweet_CONSTBYTES=16
+
+-- entropy pool
+local _entropy_pool = ffi.new("uint32_t[256]")
+
+local function update_entropy()
+    local a = raw_read_rng()
+    local a1,a2,a3,a4 = split32(a)
+    _entropy_pool[a1] = bit.bxor(raw_read_rng(), _entropy_pool[a1])
+    _entropy_pool[a2] = bit.bxor(raw_read_rng(), _entropy_pool[a2])
+    _entropy_pool[a3] = bit.bxor(raw_read_rng(), _entropy_pool[a3])
+    _entropy_pool[a4] = bit.bxor(raw_read_rng(), _entropy_pool[a4])
+end
+
+local function fill_entropy()
+    for i=1,256 do
+        _entropy_pool[i] = bit.bxor(raw_read_rng(), _entropy_pool[i])
+    end
+end
+
+local obytes = 32
+local ibytes = 16
+local kbytes = 32
+local nbytes = 24

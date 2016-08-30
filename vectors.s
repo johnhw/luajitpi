@@ -1,6 +1,16 @@
 
 .globl _start
 _start:
+    @ copy the exception vector table
+    _reset:
+    ldr r0, =_exception_handlers
+    mov r1, #0x0000
+    ldmia r0!,{r2,r3,r4,r5,r6,r7,r8,r9}
+    stmia r1!,{r2,r3,r4,r5,r6,r7,r8,r9}
+    ldmia r0!,{r2,r3,r4,r5,r6,r7,r8,r9}
+    stmia r1!,{r2,r3,r4,r5,r6,r7,r8,r9}
+    
+    @ set the stack pointer and enter main
     mov sp,#0x00210000
     mov r0,pc
     bl notmain
@@ -45,8 +55,28 @@ memory_barrier:
 	mcr	p15, #0, r0, c7, c10, #5
 	mov	pc, lr    
 
+_exception_handlers:
+    ldr pc,_reset_vector
+    ldr pc,_undefined_vector
+    ldr pc,_swi_vector
+    ldr pc,_prefetch_vector
+    ldr pc,_data_vector
+    ldr pc,_reserved_vector
+    ldr pc,_irq_vector
+    ldr pc,_fiq_vector
 
-    
+# Addresses of exception routines in the kernel
+
+_reset_vector:     .word exc_reset
+_undefined_vector: .word exc_undefined_instruction
+_swi_vector:       .word exc_software_interrupt
+_prefetch_vector:  .word exc_prefetch_abort
+_data_vector:      .word exc_data_access
+_reserved_vector:  .word exc_unhandled_exception
+_irq_vector:       .word exc_interrupt
+_fiq_vector:       .word exc_fast_interrupt
+
+
 ;@-------------------------------------------------------------------------
 ;@
 ;@ Copyright (c) 2012 David Welch dwelch@dwelch.com

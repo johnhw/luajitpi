@@ -420,6 +420,8 @@ local map_op = {
   bl_1 = "eb000000B",
   blx_1 = "e12fff30C",
   bx_1 = "e12fff10M",
+  bxj_1 = "e12fff20M",
+ 
 
   -- Miscellaneous instructions.
   nop_0 = "e1a00000",
@@ -427,6 +429,8 @@ local map_op = {
   bkpt_1 = "e1200070K", -- v5T
   svc_1 = "ef000000T", swi_1 = "ef000000T",
   ud_0 = "e7f001f0",
+  
+  
 
   -- VFP instructions.
   ["vadd.f32_3"] = "ee300a00dnm",
@@ -515,6 +519,8 @@ local map_op = {
   -- msr, nopv6, yield, wfe, wfi, sev, dbg, bxj, smc, srs, rfe
   -- cps, setend, pli, pld, pldw, clrex, dsb, dmb, isb
   -- stc, ldc, mcr, mcr2, mrc, mrc2, mcrr, mcrr2, mrrc, mrrc2, cdp, cdp2
+  
+  -- bxj
 }
 
 -- Add mnemonics for "s" variants.

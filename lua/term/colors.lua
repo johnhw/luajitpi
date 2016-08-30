@@ -18,6 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+-- Hacked together version of lua-term
+
 local pairs = pairs
 local tostring = tostring
 local setmetatable = setmetatable
@@ -80,4 +82,29 @@ for c, v in pairs(colorvalues) do
     colors[c] = makecolor(v)
 end
 
-return colors
+local function maketermfunc(sequence_fmt)
+  sequence_fmt = '\027[' .. sequence_fmt
+  local func
+  func = function(handle, ...)    
+    return io.write(sformat(sequence_fmt, ...))
+  end
+
+  return func
+end
+
+local cursor = {
+  ['goto'] = maketermfunc '%d;%dH',
+  goup     = maketermfunc '%d;A',
+  godown   = maketermfunc '%d;B',
+  goright  = maketermfunc '%d;C',
+  goleft   = maketermfunc '%d;D',
+  save     = maketermfunc 's',
+  restore  = maketermfunc 'u',
+  clear    = maketermfunc '2J',
+}
+
+cursor.jump = cursor['goto']
+cursor.clear    = maketermfunc '2J'
+cursor.cleareol = maketermfunc 'K'
+
+return {colors=colors, cursor=cursor}

@@ -860,6 +860,7 @@ dostmt = function(stmt)
     return
   end
 
+ 
   -- Split into (pseudo-)opcode and params.
   local op, params = splitstmt(stmt)
 

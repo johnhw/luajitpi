@@ -19,23 +19,6 @@ local function raw_read_rng()
     return get32(hw_rng_data)
 end
 
--- entropy pool
-local _entropy_pool = ffi.new("uint32_t[256]")
 
 
-local function update_entropy()
-    local a = raw_read_rng()
-    local a1,a2,a3,a4 = split32(a)
-    _entropy_pool[a1] = bit.bxor(raw_read_rng(), _entropy_pool[a1])
-    _entropy_pool[a2] = bit.bxor(raw_read_rng(), _entropy_pool[a2])
-    _entropy_pool[a3] = bit.bxor(raw_read_rng(), _entropy_pool[a3])
-    _entropy_pool[a4] = bit.bxor(raw_read_rng(), _entropy_pool[a4])
-end
-
-local function fill_entropy()
-    for i=1,256 do
-        _entropy_pool[i] = bit.bxor(raw_read_rng(), _entropy_pool[i])
-    end
-end
-
-return {raw=raw_read_rng, update_entropy=update_entropy, fill_entropy=fill_entropy}
+return {raw=raw_read_rng}

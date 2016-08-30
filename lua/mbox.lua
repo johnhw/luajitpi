@@ -176,6 +176,7 @@ extern int rpi_mbox_read( mbox_channel_t channel );
 ]])
 
 
+local atags = sys.atags
 
 
 tag_set = {model={"TAG_GET_BOARD_MODEL", }, 

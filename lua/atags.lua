@@ -100,7 +100,7 @@ local ATAG_REVISION=		0x54410007
 local ATAG_VIDEOLFB=		0x54410008
 local ATAG_CMDLINE=		0x54410009
 
-atags = {}
+local atags = {}
 
 local function parse_atag_callback(tag)
     -- core functionality
@@ -142,4 +142,5 @@ end
 
 local ATAG_ADDR = 0x100
 ffi.C.parse_atags(ATAG_ADDR, parse_atag_callback)
+sys.atags = atags
 

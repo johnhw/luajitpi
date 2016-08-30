@@ -69,7 +69,7 @@ end})
 local colormap = emptycolormap
 
 -- load the colors module (outside of the term module)
-local colors = require("colors")
+local colors = require("colors").colors
 
   colormap = {
     ['nil']     = colors.blue,

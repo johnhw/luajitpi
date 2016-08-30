@@ -46,3 +46,24 @@ function get_bit(v, b)
 end
  
 ffi.C.enable_mmu()
+
+
+ffi.cdef(
+[[typedef struct vector_table
+{
+    void (*reset)(void);
+    void (*undefined_instruction)(void);
+    void (*software_interrupt)(void);
+    void (*prefetch_abort)(void);
+    void (*data_access)(void);
+    void (*unhandled_exception)(void);
+    void (*interrupt)(void);
+    void (*fast_interrupt)(void);
+    
+} vector_table;
+]])
+
+sys = {}
+sys.memmap = memmap
+sys.exc_table = ffi.cast("vector_table *", memmap.exc_table)
+sys.atags = {}

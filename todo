@@ -16,21 +16,23 @@ dynasm [disassembler] (from LuaJIT 2.0.4) / MIT
 valvers arm c tutorial (mbox access) /  http://www.valvers.com/open-software/raspberry-pi/step01-bare-metal-programming-in-cpt1/
 
 -- compiled but unlinked
-nacl [crypto] (tweetnacl) **MUST PROVIDE randombytes()! ** / https://tweetnacl.cr.yp.to/ / Public domain
+nacl [crypto] (tweetnacl) / https://tweetnacl.cr.yp.to/ / Public domain
 sqlite [filesystem]  / https://sqlite.org/ / Public domain
 lua-glob-pattern / https://github.com/davidm/lua-glob-pattern / MIT
 
 
 --todo
-assembler 
-modularise
+fix randombytes
+lua-term
+add missing assembler/disassembler instructions
+make requiring .dasl files work
 basic multiline editor (list of lines)
 upload/download
 make i/o changeable from lua 
+better module structure
+linker for modules?
+make vfs talk to the zip structure
 vectors at 0x0
-test hw rng
-check memory access
-
 microlight?
 lsqlite3?
 add basic header files
@@ -42,7 +44,3 @@ bitstream [bitstream reading/writing]
 turtle [quaternions, matrices]
 stb_texedit [text editor] / public domain
 nuklear [ui] / public domain
-
--- questionable
-torch? [numerical]
-

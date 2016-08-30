@@ -14,7 +14,7 @@ end
 function dump(offset, len)
     -- force 16 byte alignment
     local i = 0
-    local off =  bit.band(offset, bit.bnot(15))
+    local off =  bit.band(offset, bit.bnot(15)) 
     while i<len do
         local s = ""
         for j = 0,15 do

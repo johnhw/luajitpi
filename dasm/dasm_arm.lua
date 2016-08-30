@@ -1100,6 +1100,10 @@ function _M.setup(arch, opt)
   g_arch, g_opt = arch, opt
 end
 
+function _M.getactlist()
+    return actlist
+end
+
 -- Merge the core maps and the arch-specific maps.
 function _M.mergemaps(map_coreop, map_def)
   setmetatable(map_op, { __index = function(t, k)

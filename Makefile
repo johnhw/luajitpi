@@ -18,6 +18,10 @@ clean :
 	rm -f *.list
 	rm -f *.img
 	rm -f *.bc
+	rm -f *.map
+	rm -f *.gch
+	rm -f *.fmap
+	rm -f *.pre_h
 	rm -f *.clang.opt.s
 	rm bootfiles.zip
 	rm fmap.c
@@ -26,7 +30,7 @@ clean :
 sqlite/sqlite3.o : sqlite/sqlite3.c
 	echo "Nothing to do"
     
-OBJS = vectors.o ljuart.o syscalls.o tcc_wrap.o  ldl.o
+OBJS = vectors.o ljuart.o syscalls.o tcc_wrap.o  ldl.o exception.o
 OBJS += linenoise/linenoise.o mmu.o
 OBJS += rboot/elf.o rboot/mbox.o rboot/mmio.o rboot/block.o rboot/mbr.o 
 OBJS += rboot/emmc.o rboot/libfs.o rboot/fat.o rboot/vfs.o rboot/timer.o
