@@ -5,7 +5,6 @@ miniz [compression] (miniz.c) https://github.com/richgel999/miniz / public-domai
 rpi-boot [framebuffer, sd card, fs] (rpiboot, modified to avoid name conflict) / https://github.com/jncronin/rpi-boot / BSD
 linenoise [nice terminal] (linenoise) / https://github.com/antirez/linenoise / BSD
 lpeg [text matching] (lpeg-1.0.0) / http://www.inf.puc-rio.br/~roberto/lpeg/ / MIT 
-serial port (from pijFORTHos) / https://github.com/organix/pijFORTHos / LGPL    
 uart02 example (from dwelch67) / https://github.com/dwelch67/raspberrypi/tree/master/uart02 / MIT
 ffi-reflect [ffi-reflection] (ffi-reflect) https://github.com/corsix/ffi-reflect / MIT?
 penlight [lua utilities] (penlight) / https://github.com/stevedonovan/Penlight / MIT
